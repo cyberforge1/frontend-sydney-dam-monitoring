@@ -1,4 +1,4 @@
-// # src/pages/SelectedDamPage/SelectedDamPage.tsx
+// src/pages/SelectedDamPage/SelectedDamPage.tsx
 
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -23,7 +23,6 @@ interface Dam {
     longitude?: number;
 }
 
-// Expected type for graph components
 interface DamResource {
     date: string;
     percentage_full: number;
@@ -37,71 +36,45 @@ const SelectedDamPage: React.FC = () => {
     const navigate = useNavigate();
     const [damData, setDamData] = useState<Dam | null>(location.state?.damData || null);
     const [damResources, setDamResources] = useState<DamResource[]>([]);
-    const [avgPercentageFull12Months, setAvgPercentageFull12Months] = useState<number | null>(null);
-    const [avgPercentageFull5Years, setAvgPercentageFull5Years] = useState<number | null>(null);
-    const [avgPercentageFull20Years, setAvgPercentageFull20Years] = useState<number | null>(null);
+    const [avgData, setAvgData] = useState<{ [key: string]: number | null }>({
+        avg12Months: null,
+        avg5Years: null,
+        avg20Years: null,
+    });
 
     useEffect(() => {
         if (!damData && location.state?.damName) {
-            const loadDamData = async () => {
-                try {
-                    const data = await fetchDamDataByName(location.state.damName);
-                    setDamData(data[0]); // Assuming the API returns an array
-                } catch (error) {
-                    console.error('Error fetching dam data:', error);
-                }
-            };
-
-            loadDamData();
+            fetchDamDataByName(location.state.damName)
+                .then(data => setDamData(data[0]))
+                .catch(error => console.error('Error fetching dam data:', error));
         }
     }, [damData, location.state?.damName]);
 
     useEffect(() => {
         if (damData) {
-            const loadDamResources = async () => {
+            const fetchData = async () => {
                 try {
-                    const resources = await fetchDamResources(damData.dam_id);
-
-                    // Transform data to match DamResource type
-                    const transformedResources: DamResource[] = resources
-                        .filter(
-                            resource =>
-                                resource.percentage_full !== undefined &&
-                                resource.storage_volume !== undefined &&
-                                resource.storage_inflow !== undefined &&
-                                resource.storage_release !== undefined
-                        )
-                        .map(resource => ({
-                            date: resource.date,
-                            percentage_full: resource.percentage_full as number,
-                            storage_volume: resource.storage_volume as number,
-                            storage_inflow: resource.storage_inflow as number,
-                            storage_release: resource.storage_release as number,
-                        }));
-
-                    setDamResources(transformedResources);
+                    const [resources, avg12, avg5, avg20] = await Promise.all([
+                        fetchDamResources(damData.dam_id).then(data =>
+                            data.map(resource => ({
+                                ...resource,
+                                percentage_full: resource.percentage_full ?? 0, // Ensure percentage_full is a number
+                                storage_volume: resource.storage_volume ?? 0,
+                                storage_inflow: resource.storage_inflow ?? 0,
+                                storage_release: resource.storage_release ?? 0,
+                            }))
+                        ),
+                        fetchAvgPercentageFull12MonthsById(damData.dam_id),
+                        fetchAvgPercentageFull5YearsById(damData.dam_id),
+                        fetchAvgPercentageFull20YearsById(damData.dam_id),
+                    ]);
+                    setDamResources(resources);
+                    setAvgData({ avg12Months: avg12, avg5Years: avg5, avg20Years: avg20 });
                 } catch (error) {
-                    console.error('Error fetching dam resources:', error);
+                    console.error('Error fetching dam details:', error);
                 }
             };
-
-            const loadAvgPercentageFullData = async () => {
-                try {
-                    const avg12Months = await fetchAvgPercentageFull12MonthsById(damData.dam_id);
-                    setAvgPercentageFull12Months(avg12Months);
-
-                    const avg5Years = await fetchAvgPercentageFull5YearsById(damData.dam_id);
-                    setAvgPercentageFull5Years(avg5Years);
-
-                    const avg20Years = await fetchAvgPercentageFull20YearsById(damData.dam_id);
-                    setAvgPercentageFull20Years(avg20Years);
-                } catch (error) {
-                    console.error('Error fetching average percentage full data:', error);
-                }
-            };
-
-            loadDamResources();
-            loadAvgPercentageFullData();
+            fetchData();
         }
     }, [damData]);
 
@@ -113,69 +86,34 @@ const SelectedDamPage: React.FC = () => {
         navigate('/');
     };
 
-    const damName = damData.dam_name;
-    const latitude = damData.latitude || 0;
-    const longitude = damData.longitude || 0;
+    const { dam_name: damName, latitude = 0, longitude = 0 } = damData;
 
     return (
         <div className="selected-dam-page">
             <button className="back-button" onClick={handleBackClick}>
                 Back
             </button>
-            <div className="dam-header">
-                <h1>{damName} Insights</h1>
-            </div>
+            <h1>{damName} Insights</h1>
             <div className="content-row">
-                <div className="dam-content">
-                    <DamCapacityGraph data={damResources} damName={damName} />
-                </div>
-                <div className="dam-content">
-                    <NetInflowReleaseGraph data={damResources} damName={damName} />
-                </div>
+                <DamCapacityGraph data={damResources} damName={damName} />
+                <NetInflowReleaseGraph data={damResources} damName={damName} />
             </div>
             <div className="content-row">
                 <DamContent content="">
-                    <div
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            textAlign: 'center',
-                            height: '100%',
-                            width: '100%',
-                            fontSize: '1.5rem',
-                        }}
-                    >
-                        <p style={{ width: '100%', marginBottom: '20px' }}>
-                            <span style={{ marginRight: '0.5rem' }}>{damName} Average Percentage Full (12 Months):</span>
-                            {avgPercentageFull12Months !== null ? (
-                                <span style={{ fontWeight: 'bold' }}>{avgPercentageFull12Months.toFixed(2) + '%'}</span>
-                            ) : (
-                                <i className="fas fa-spinner fa-spin"></i>
-                            )}
-                        </p>
-                        <p style={{ width: '100%', marginBottom: '20px' }}>
-                            <span style={{ marginRight: '0.5rem' }}>{damName} Average Percentage Full (5 Years):</span>
-                            {avgPercentageFull5Years !== null ? (
-                                <span style={{ fontWeight: 'bold' }}>{avgPercentageFull5Years.toFixed(2) + '%'}</span>
-                            ) : (
-                                <i className="fas fa-spinner fa-spin"></i>
-                            )}
-                        </p>
-                        <p style={{ width: '100%' }}>
-                            <span style={{ marginRight: '0.5rem' }}>{damName} Average Percentage Full (20 Years):</span>
-                            {avgPercentageFull20Years !== null ? (
-                                <span style={{ fontWeight: 'bold' }}>{avgPercentageFull20Years.toFixed(2) + '%'}</span>
-                            ) : (
-                                <i className="fas fa-spinner fa-spin"></i>
-                            )}
-                        </p>
-                    </div>
+                    <p>
+                        {damName} Average Percentage Full (12 Months):{' '}
+                        {avgData.avg12Months !== null ? `${avgData.avg12Months.toFixed(2)}%` : 'Loading...'}
+                    </p>
+                    <p>
+                        {damName} Average Percentage Full (5 Years):{' '}
+                        {avgData.avg5Years !== null ? `${avgData.avg5Years.toFixed(2)}%` : 'Loading...'}
+                    </p>
+                    <p>
+                        {damName} Average Percentage Full (20 Years):{' '}
+                        {avgData.avg20Years !== null ? `${avgData.avg20Years.toFixed(2)}%` : 'Loading...'}
+                    </p>
                 </DamContent>
-                <div className="dam-content">
-                    <GoogleMapComponent lat={latitude} lng={longitude} />
-                </div>
+                <GoogleMapComponent lat={latitude} lng={longitude} />
             </div>
         </div>
     );

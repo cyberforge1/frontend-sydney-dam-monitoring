@@ -1,7 +1,7 @@
 // src/services/api.ts
 
-// Define the API base URL
-const BASE_URL = 'http://localhost:5001/api';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
+
 
 // Define interfaces for better type safety
 interface Dam {
@@ -39,83 +39,85 @@ interface DamAnalysis {
     avg_storage_release_20_years?: number;
 }
 
+// Centralized data transformation and validation
+const validateDamResources = (resources: DamResource[]): DamResource[] =>
+    resources
+        .filter(
+            resource =>
+                resource.percentage_full !== undefined &&
+                resource.storage_volume !== undefined &&
+                resource.storage_inflow !== undefined &&
+                resource.storage_release !== undefined
+        )
+        .map(resource => ({
+            ...resource,
+            percentage_full: resource.percentage_full!,
+            storage_volume: resource.storage_volume!,
+            storage_inflow: resource.storage_inflow!,
+            storage_release: resource.storage_release!,
+        }));
+
 // Helper function for making API calls
 const apiFetch = async <T>(endpoint: string): Promise<T> => {
-    const response = await fetch(`${BASE_URL}${endpoint}`);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch ${endpoint}: ${response.statusText}`);
+    try {
+        const response = await fetch(`${BASE_URL}${endpoint}`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch ${endpoint}: ${response.statusText}`);
+        }
+        return response.json();
+    } catch (error) {
+        console.error('API fetch error:', error);
+        throw error;
     }
-    return response.json();
 };
 
-// Fetch "Hello World" message from the API
-export const fetchHelloWorld = async (): Promise<string> => {
-    return apiFetch<string>('/');
-};
+// API Methods
+export const fetchHelloWorld = async (): Promise<string> => apiFetch<string>('/');
 
-// Fetch latest data for a specific dam by ID
-export const fetchLatestDataById = async (damId: string): Promise<DamResource> => {
-    return apiFetch<DamResource>(`/latest_data/${damId}`);
-};
+export const fetchLatestDataById = async (damId: string): Promise<DamResource> =>
+    apiFetch<DamResource>(`/latest_data/${damId}`);
 
-// Fetch dams data by group name
-export const fetchDamsDataByGroup = async (groupName: string): Promise<Dam[]> => {
-    return apiFetch<Dam[]>(`/dam_groups/${groupName}`);
-};
+export const fetchDamsDataByGroup = async (groupName: string): Promise<Dam[]> =>
+    apiFetch<Dam[]>(`/dam_groups/${groupName}`);
 
-// Fetch all dam names
-export const fetchDamNames = async (): Promise<string[]> => {
-    const data = await apiFetch<Dam[]>(`/dams/`);
-    return data.map(dam => dam.dam_name);
-};
+export const fetchDamNames = async (): Promise<string[]> =>
+    apiFetch<Dam[]>(`/dams/`).then(data => data.map(dam => dam.dam_name));
 
-// Fetch dam data by name
-export const fetchDamDataByName = async (damName: string): Promise<Dam[]> => {
-    return apiFetch<Dam[]>(`/dams?dam_name=${encodeURIComponent(damName)}`);
-};
+export const fetchDamDataByName = async (damName: string): Promise<Dam[]> =>
+    apiFetch<Dam[]>(`/dams?dam_name=${encodeURIComponent(damName)}`);
 
-// Fetch dam resources by dam ID
-export const fetchDamResources = async (damId: string): Promise<DamResource[]> => {
-    return apiFetch<DamResource[]>(`/dam_resources/${damId}`);
-};
+export const fetchDamResources = async (damId: string): Promise<DamResource[]> =>
+    apiFetch<DamResource[]>(`/dam_resources/${damId}`).then(validateDamResources);
 
-// Fetch overall analysis: Average percentage full for 12 months
-export const fetchAvgPercentageFull12Months = async (): Promise<number> => {
-    const data = await apiFetch<{ avg_percentage_full_12_months: number }>(`/overall_dam_analysis`);
-    return data.avg_percentage_full_12_months;
-};
+export const fetchAvgPercentageFull12Months = async (): Promise<number> =>
+    apiFetch<{ avg_percentage_full_12_months: number }>(`/overall_dam_analysis`).then(
+        data => data.avg_percentage_full_12_months
+    );
 
-// Fetch overall analysis: Average percentage full for 5 years
-export const fetchAvgPercentageFull5Years = async (): Promise<number> => {
-    const data = await apiFetch<{ avg_percentage_full_5_years: number }>(`/overall_dam_analysis`);
-    return data.avg_percentage_full_5_years;
-};
+export const fetchAvgPercentageFull5Years = async (): Promise<number> =>
+    apiFetch<{ avg_percentage_full_5_years: number }>(`/overall_dam_analysis`).then(
+        data => data.avg_percentage_full_5_years
+    );
 
-// Fetch overall analysis: Average percentage full for 20 years
-export const fetchAvgPercentageFull20Years = async (): Promise<number> => {
-    const data = await apiFetch<{ avg_percentage_full_20_years: number }>(`/overall_dam_analysis`);
-    return data.avg_percentage_full_20_years;
-};
+export const fetchAvgPercentageFull20Years = async (): Promise<number> =>
+    apiFetch<{ avg_percentage_full_20_years: number }>(`/overall_dam_analysis`).then(
+        data => data.avg_percentage_full_20_years
+    );
 
-// Fetch specific dam analysis for 12 months by dam ID
-export const fetchAvgPercentageFull12MonthsById = async (damId: string): Promise<number> => {
-    const data = await apiFetch<{ avg_percentage_full_12_months: number }>(`/specific_dam_analysis/${damId}`);
-    return data.avg_percentage_full_12_months;
-};
+export const fetchAvgPercentageFull12MonthsById = async (damId: string): Promise<number> =>
+    apiFetch<{ avg_percentage_full_12_months: number }>(`/specific_dam_analysis/${damId}`).then(
+        data => data.avg_percentage_full_12_months
+    );
 
-// Fetch specific dam analysis for 5 years by dam ID
-export const fetchAvgPercentageFull5YearsById = async (damId: string): Promise<number> => {
-    const data = await apiFetch<{ avg_percentage_full_5_years: number }>(`/specific_dam_analysis/${damId}`);
-    return data.avg_percentage_full_5_years;
-};
+export const fetchAvgPercentageFull5YearsById = async (damId: string): Promise<number> =>
+    apiFetch<{ avg_percentage_full_5_years: number }>(`/specific_dam_analysis/${damId}`).then(
+        data => data.avg_percentage_full_5_years
+    );
 
-// Fetch specific dam analysis for 20 years by dam ID
-export const fetchAvgPercentageFull20YearsById = async (damId: string): Promise<number> => {
-    const data = await apiFetch<{ avg_percentage_full_20_years: number }>(`/specific_dam_analysis/${damId}`);
-    return data.avg_percentage_full_20_years;
-};
+export const fetchAvgPercentageFull20YearsById = async (damId: string): Promise<number> =>
+    apiFetch<{ avg_percentage_full_20_years: number }>(`/specific_dam_analysis/${damId}`).then(
+        data => data.avg_percentage_full_20_years
+    );
 
-// Fetch dam data for 12 months by group name
-export const fetchDamData12Months = async (groupName: string): Promise<DamAnalysis[]> => {
-    return apiFetch<DamAnalysis[]>(`/overall_dam_analysis/12_months/${groupName}`);
-};
+export const fetchDamData12Months = async (groupName: string): Promise<DamAnalysis[]> =>
+    apiFetch<DamAnalysis[]>(`/overall_dam_analysis/12_months/${groupName}`);
