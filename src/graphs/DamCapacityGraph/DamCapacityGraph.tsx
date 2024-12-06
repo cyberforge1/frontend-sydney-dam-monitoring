@@ -1,4 +1,4 @@
-// src/graphs/DamCapacityGraph/DamCapacityGraph.tsx
+// # src/graphs/DamCapacityGraph/DamCapacityGraph.tsx
 
 import React from 'react';
 import { Line } from 'react-chartjs-2';
@@ -6,8 +6,13 @@ import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
 
+interface DamResource {
+    date: string;
+    percentage_full: number;
+}
+
 interface DamCapacityGraphProps {
-    data: any[];
+    data: DamResource[];
     damName: string;
 }
 

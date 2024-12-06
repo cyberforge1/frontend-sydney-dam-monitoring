@@ -1,7 +1,7 @@
 // src/services/api.ts
 
 // Define the API base URL
-const BASE_URL = '/api';
+const BASE_URL = 'http://localhost:5001/api';
 
 // Define interfaces for better type safety
 interface Dam {

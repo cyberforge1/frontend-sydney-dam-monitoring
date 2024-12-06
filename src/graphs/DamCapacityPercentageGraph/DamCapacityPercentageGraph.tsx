@@ -1,4 +1,4 @@
-// src/graphs/DamCapacityPercentageGraph/DamCapacityPercentageGraph.tsx
+// # src/graphs/DamCapacityPercentageGraph/DamCapacityPercentageGraph.tsx
 
 import React from 'react';
 import { Line } from 'react-chartjs-2';
@@ -7,11 +7,18 @@ import './DamCapacityPercentageGraph.scss';
 
 Chart.register(...registerables);
 
-interface DamCapacityPercentageGraphProps {
-    data: any[];
+interface DamAnalysis {
+    dam_id: string;
+    dam_name: string;
+    date: string;
+    percentage_full: number | null;
 }
 
-const getColor = (index: number) => {
+interface DamCapacityPercentageGraphProps {
+    data: DamAnalysis[];
+}
+
+const getColor = (index: number): string => {
     const colors = [
         '#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6',
         '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
@@ -61,50 +68,27 @@ const DamCapacityPercentageGraph: React.FC<DamCapacityPercentageGraphProps> = ({
                 title: {
                     display: true,
                     text: 'Date',
-                    font: {
-                        size: 18
-                    }
+                    font: { size: 18 }
                 },
-                ticks: {
-                    maxRotation: 45,
-                    minRotation: 45,
-                    font: {
-                        size: 14
-                    }
-                }
+                ticks: { font: { size: 14 } }
             },
             y: {
                 title: {
                     display: true,
                     text: 'Percentage Full',
-                    font: {
-                        size: 18
-                    }
+                    font: { size: 18 }
                 },
-                ticks: {
-                    beginAtZero: true,
-                    font: {
-                        size: 14
-                    }
-                }
+                ticks: { font: { size: 14 } }
             }
         },
         plugins: {
             title: {
                 display: true,
                 text: 'Dam Capacity Percentage Over Last 12 Months',
-                font: {
-                    size: 24
-                }
+                font: { size: 24 }
             },
             legend: {
-                display: true,
-                position: 'top' as 'top',
-                labels: {
-                    font: {
-                        size: 14
-                    }
-                }
+                labels: { font: { size: 14 } }
             }
         },
         responsive: true,

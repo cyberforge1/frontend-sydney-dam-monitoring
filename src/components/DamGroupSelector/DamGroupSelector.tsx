@@ -1,4 +1,4 @@
-// src/components/DamGroupSelector/DamGroupSelector.tsx
+// # src/components/DamGroupSelector/DamGroupSelector.tsx
 
 import React, { useState } from 'react';
 import './DamGroupSelector.scss';
@@ -12,7 +12,7 @@ const groups = [
     { value: 'popular_dams', label: 'Popular Dams' },
     { value: 'large_dams', label: 'Large Dams' },
     { value: 'small_dams', label: 'Small Dams' },
-    { value: 'greatest_released', label: 'Highest flow' },
+    { value: 'greatest_released', label: 'Highest Flow' },
 ];
 
 const DamGroupSelector: React.FC<DamGroupSelectorProps> = ({ onSelectGroup }) => {

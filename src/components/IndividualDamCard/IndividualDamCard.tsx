@@ -1,4 +1,4 @@
-// src/components/IndividualDamCard/IndividualDamCard.tsx
+// # src/components/IndividualDamCard/IndividualDamCard.tsx
 
 import React from 'react';
 import { Pie } from 'react-chartjs-2';
@@ -13,22 +13,24 @@ import './IndividualDamCard.scss';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
+interface DamData {
+    dam_id: string;
+    dam_name: string;
+    percentage_full: number;
+}
+
 interface IndividualDamCardProps {
-    damData: any;
+    damData: DamData;
 }
 
 const IndividualDamCard: React.FC<IndividualDamCardProps> = ({ damData }) => {
     const navigate = useNavigate();
 
-    if (!damData) {
-        return <div>Loading...</div>;
-    }
-
     const pieData = {
         labels: ['Full', 'Empty'],
         datasets: [
             {
-                data: [Number(damData.percentage_full), 100 - Number(damData.percentage_full)],
+                data: [damData.percentage_full, 100 - damData.percentage_full],
                 backgroundColor: ['#5274EA', '#E63C74'],
             },
         ],
@@ -40,7 +42,7 @@ const IndividualDamCard: React.FC<IndividualDamCardProps> = ({ damData }) => {
     };
 
     const handleDamNameClick = () => {
-        navigate('/dam', { state: { damData } }); 
+        navigate('/dam', { state: { damData } });
     };
 
     return (

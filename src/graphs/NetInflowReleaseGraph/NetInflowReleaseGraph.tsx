@@ -1,4 +1,4 @@
-// src/graphs/NetInflowReleaseGraph/NetInflowReleaseGraph.tsx
+// # src/graphs/NetInflowReleaseGraph/NetInflowReleaseGraph.tsx
 
 import React from 'react';
 import { Line } from 'react-chartjs-2';
@@ -6,8 +6,14 @@ import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
 
+interface DamResource {
+    date: string;
+    storage_inflow: number;
+    storage_release: number;
+}
+
 interface NetInflowReleaseGraphProps {
-    data: any[];
+    data: DamResource[];
     damName: string;
 }
 

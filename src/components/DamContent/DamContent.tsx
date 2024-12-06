@@ -1,4 +1,4 @@
-// src/components/DamContent/DamContent.tsx
+// # src/components/DamContent/DamContent.tsx
 
 import React from 'react';
 import './DamContent.scss';
@@ -8,9 +8,10 @@ interface DamContentProps {
     children?: React.ReactNode;
 }
 
-const DamContent: React.FC<DamContentProps> = ({ children }) => {
+const DamContent: React.FC<DamContentProps> = ({ content, children }) => {
     return (
         <div className="dam-content">
+            <p>{content}</p>
             {children}
         </div>
     );

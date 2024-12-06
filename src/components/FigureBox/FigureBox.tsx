@@ -1,11 +1,16 @@
-// src/components/FigureBox/FigureBox.tsx
+// # src/components/FigureBox/FigureBox.tsx
 
 import React from 'react';
 import './FigureBox.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
-const FigureBox: React.FC<{ title: string, data: string | null }> = ({ title, data }) => {
+interface FigureBoxProps {
+    title: string;
+    data: string | null;
+}
+
+const FigureBox: React.FC<FigureBoxProps> = ({ title, data }) => {
     return (
         <div className="figure-box">
             <div className="figure-box-title">{title}</div>

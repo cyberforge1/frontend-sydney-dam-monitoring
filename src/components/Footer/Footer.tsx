@@ -1,4 +1,4 @@
-// src/components/Footer/Footer.tsx
+// # src/components/Footer/Footer.tsx
 
 import React from 'react';
 import './Footer.scss';
@@ -26,4 +26,4 @@ const Footer: React.FC = () => {
     );
 };
 
-export default Footer;  
+export default Footer;

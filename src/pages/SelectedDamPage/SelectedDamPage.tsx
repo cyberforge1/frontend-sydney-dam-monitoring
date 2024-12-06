@@ -1,13 +1,13 @@
-// src/pages/SelectedDamPage/SelectedDamPage.tsx
+// # src/pages/SelectedDamPage/SelectedDamPage.tsx
 
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { 
-    fetchDamDataByName, 
+import {
+    fetchDamDataByName,
     fetchDamResources,
     fetchAvgPercentageFull12MonthsById,
     fetchAvgPercentageFull5YearsById,
-    fetchAvgPercentageFull20YearsById
+    fetchAvgPercentageFull20YearsById,
 } from '../../services/api';
 import DamContent from '../../components/DamContent/DamContent';
 import GoogleMapComponent from '../../components/GoogleMapComponent/GoogleMapComponent';
@@ -15,11 +15,28 @@ import DamCapacityGraph from '../../graphs/DamCapacityGraph/DamCapacityGraph';
 import NetInflowReleaseGraph from '../../graphs/NetInflowReleaseGraph/NetInflowReleaseGraph';
 import './SelectedDamPage.scss';
 
+interface Dam {
+    dam_id: string;
+    dam_name: string;
+    full_volume?: number;
+    latitude?: number;
+    longitude?: number;
+}
+
+// Expected type for graph components
+interface DamResource {
+    date: string;
+    percentage_full: number;
+    storage_volume: number;
+    storage_inflow: number;
+    storage_release: number;
+}
+
 const SelectedDamPage: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const [damData, setDamData] = useState<any>(location.state?.damData);
-    const [damResources, setDamResources] = useState<any[]>([]);
+    const [damData, setDamData] = useState<Dam | null>(location.state?.damData || null);
+    const [damResources, setDamResources] = useState<DamResource[]>([]);
     const [avgPercentageFull12Months, setAvgPercentageFull12Months] = useState<number | null>(null);
     const [avgPercentageFull5Years, setAvgPercentageFull5Years] = useState<number | null>(null);
     const [avgPercentageFull20Years, setAvgPercentageFull20Years] = useState<number | null>(null);
@@ -29,7 +46,7 @@ const SelectedDamPage: React.FC = () => {
             const loadDamData = async () => {
                 try {
                     const data = await fetchDamDataByName(location.state.damName);
-                    setDamData(data);
+                    setDamData(data[0]); // Assuming the API returns an array
                 } catch (error) {
                     console.error('Error fetching dam data:', error);
                 }
@@ -44,7 +61,25 @@ const SelectedDamPage: React.FC = () => {
             const loadDamResources = async () => {
                 try {
                     const resources = await fetchDamResources(damData.dam_id);
-                    setDamResources(resources);
+
+                    // Transform data to match DamResource type
+                    const transformedResources: DamResource[] = resources
+                        .filter(
+                            resource =>
+                                resource.percentage_full !== undefined &&
+                                resource.storage_volume !== undefined &&
+                                resource.storage_inflow !== undefined &&
+                                resource.storage_release !== undefined
+                        )
+                        .map(resource => ({
+                            date: resource.date,
+                            percentage_full: resource.percentage_full as number,
+                            storage_volume: resource.storage_volume as number,
+                            storage_inflow: resource.storage_inflow as number,
+                            storage_release: resource.storage_release as number,
+                        }));
+
+                    setDamResources(transformedResources);
                 } catch (error) {
                     console.error('Error fetching dam resources:', error);
                 }
@@ -79,12 +114,14 @@ const SelectedDamPage: React.FC = () => {
     };
 
     const damName = damData.dam_name;
-    const latitude = parseFloat(damData.latitude);
-    const longitude = parseFloat(damData.longitude);
+    const latitude = damData.latitude || 0;
+    const longitude = damData.longitude || 0;
 
     return (
         <div className="selected-dam-page">
-            <button className="back-button" onClick={handleBackClick}>Back</button>
+            <button className="back-button" onClick={handleBackClick}>
+                Back
+            </button>
             <div className="dam-header">
                 <h1>{damName} Insights</h1>
             </div>
@@ -98,22 +135,22 @@ const SelectedDamPage: React.FC = () => {
             </div>
             <div className="content-row">
                 <DamContent content="">
-                    <div style={{ 
-                        display: 'flex', 
-                        flexDirection: 'column', 
-                        justifyContent: 'center', 
-                        alignItems: 'center', 
-                        textAlign: 'center', 
-                        height: '100%', 
-                        width: '100%', 
-                        fontSize: '1.5rem' 
-                    }}>
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            textAlign: 'center',
+                            height: '100%',
+                            width: '100%',
+                            fontSize: '1.5rem',
+                        }}
+                    >
                         <p style={{ width: '100%', marginBottom: '20px' }}>
-                            <span style={{ marginRight: '0.5rem' }}>{damName} Average Percentage Full (12 Months):</span> 
+                            <span style={{ marginRight: '0.5rem' }}>{damName} Average Percentage Full (12 Months):</span>
                             {avgPercentageFull12Months !== null ? (
-                                <span style={{ fontWeight: 'bold' }}>
-                                    {avgPercentageFull12Months.toFixed(2) + '%'}
-                                </span>
+                                <span style={{ fontWeight: 'bold' }}>{avgPercentageFull12Months.toFixed(2) + '%'}</span>
                             ) : (
                                 <i className="fas fa-spinner fa-spin"></i>
                             )}
@@ -121,9 +158,7 @@ const SelectedDamPage: React.FC = () => {
                         <p style={{ width: '100%', marginBottom: '20px' }}>
                             <span style={{ marginRight: '0.5rem' }}>{damName} Average Percentage Full (5 Years):</span>
                             {avgPercentageFull5Years !== null ? (
-                                <span style={{ fontWeight: 'bold' }}>
-                                    {avgPercentageFull5Years.toFixed(2) + '%'}
-                                </span>
+                                <span style={{ fontWeight: 'bold' }}>{avgPercentageFull5Years.toFixed(2) + '%'}</span>
                             ) : (
                                 <i className="fas fa-spinner fa-spin"></i>
                             )}
@@ -131,9 +166,7 @@ const SelectedDamPage: React.FC = () => {
                         <p style={{ width: '100%' }}>
                             <span style={{ marginRight: '0.5rem' }}>{damName} Average Percentage Full (20 Years):</span>
                             {avgPercentageFull20Years !== null ? (
-                                <span style={{ fontWeight: 'bold' }}>
-                                    {avgPercentageFull20Years.toFixed(2) + '%'}
-                                </span>
+                                <span style={{ fontWeight: 'bold' }}>{avgPercentageFull20Years.toFixed(2) + '%'}</span>
                             ) : (
                                 <i className="fas fa-spinner fa-spin"></i>
                             )}
