@@ -1,93 +1,79 @@
 // src/pages/HomePage/HomePage.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { fetchDamsByGroupNameThunk } from '../../features/damGroups/damGroupsSlice';
+import { fetchLatestDataByIdThunk } from '../../features/damResources/damResourcesSlice';
 import TopDamsPieCharts from '../../containers/TopDamsPieCharts/TopDamsPieCharts';
 import DamGroupSelector from '../../components/DamGroupSelector/DamGroupSelector';
 import SearchForDam from '../../components/SearchForDam/SearchForDam';
 import OpenListOfDams from '../../components/OpenListOfDams/OpenListOfDams';
-import { fetchDamsByGroupName, fetchLatestDataById } from '../../services/api'; // Ensure these functions are correctly implemented
 import './HomePage.scss';
-
-interface DamData {
-    dam_id: string;
-    dam_name: string;
-    percentage_full: number;
-}
+import { DamData } from '../../types/types';
 
 const HomePage: React.FC = () => {
-    // State to manage the selected group
-    const [selectedGroup, setSelectedGroup] = useState<string>('sydney_dams');
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
-    const [damData, setDamData] = useState<DamData[]>([]); // State to store fetched dam data
+  const dispatch = useAppDispatch();
 
-    // Effect to fetch dam data whenever the selected group changes
-    useEffect(() => {
-        const fetchDamData = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                const dams = await fetchDamsByGroupName(selectedGroup); // Fetch dams using the updated API
+  // Selectors from damGroupsSlice
+  const { groupDams, status, error } = useAppSelector((state) => state.damGroups);
+  
+  // Selector from damResourcesSlice
+  const { latestData } = useAppSelector((state) => state.damResources);
+  
+  const [selectedGroup, setSelectedGroup] = React.useState<string>('sydney_dams');
 
-                // For each dam, fetch latest data
-                const damDataPromises = dams.map(async (dam) => {
-                    try {
-                        const latestData = await fetchLatestDataById(dam.dam_id);
-                        return {
-                            dam_id: dam.dam_id,
-                            dam_name: dam.dam_name,
-                            percentage_full: latestData.percentage_full ?? 0, // Default to 0 if undefined
-                        };
-                    } catch (err) {
-                        console.error(`Error fetching latest data for dam ${dam.dam_id}:`, err);
-                        return {
-                            dam_id: dam.dam_id,
-                            dam_name: dam.dam_name,
-                            percentage_full: 0,
-                        };
-                    }
-                });
+  // Fetch dams based on selected group
+  useEffect(() => {
+    if (selectedGroup) {
+      dispatch(fetchDamsByGroupNameThunk(selectedGroup));
+    }
+  }, [selectedGroup, dispatch]);
 
-                const combinedDamData = await Promise.all(damDataPromises);
-                setDamData(combinedDamData); // Utilize damData by setting it here
-                setLoading(false);
-            } catch (err) {
-                console.error('Error fetching dams by group:', err);
-                setError('Failed to load dam data.');
-                setLoading(false);
-            }
-        };
+  // Fetch latest data for each dam in the selected group
+  useEffect(() => {
+    if (groupDams.length > 0) {
+      groupDams.forEach((dam) => {
+        dispatch(fetchLatestDataByIdThunk(dam.dam_id));
+      });
+    }
+  }, [groupDams, dispatch]);
 
-        fetchDamData();
-    }, [selectedGroup]);
+  // Transform data for TopDamsPieCharts
+  const damData: DamData[] = groupDams.map((dam) => {
+    const latest = latestData.find((data) => data.dam_id === dam.dam_id);
+    return {
+      dam_id: dam.dam_id,
+      dam_name: dam.dam_name,
+      percentage_full: latest?.percentage_full ?? 0,
+    };
+  });
 
-    // Render the component
-    return (
-        <div className="homepage">
-            {/* Header section */}
-            <div className="header">
-                <h1>Sydney Dam Monitoring</h1>
-                <p>This website tracks live and historic data from the dams across NSW, Australia</p>
-            </div>
-            {/* Controls section */}
-            <div className="controls">
-                <OpenListOfDams />
-                <SearchForDam />
-                <DamGroupSelector onSelectGroup={setSelectedGroup} />
-            </div>
-            {/* Charts section */}
-            <div className="top-dams-pie-charts-container">
-                {loading ? (
-                    <div>Loading top dams...</div>
-                ) : error ? (
-                    <div className="error">{error}</div>
-                ) : (
-                    /* Pass damData as a prop */
-                    <TopDamsPieCharts damData={damData} />
-                )}
-            </div>
-        </div>
-    );
+  return (
+    <div className="homepage">
+      {/* Header section */}
+      <div className="header">
+        <h1>Sydney Dam Monitoring</h1>
+        <p>This website tracks live and historic data from the dams across NSW, Australia</p>
+      </div>
+      {/* Controls section */}
+      <div className="controls">
+        <OpenListOfDams />
+        <SearchForDam />
+        <DamGroupSelector onSelectGroup={setSelectedGroup} />
+      </div>
+      {/* Charts section */}
+      <div className="top-dams-pie-charts-container">
+        {status === 'loading' ? (
+          <div>Loading top dams...</div>
+        ) : status === 'failed' ? (
+          <div className="error">{error}</div>
+        ) : (
+          /* Pass damData as a prop */
+          <TopDamsPieCharts damData={damData} />
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default HomePage;

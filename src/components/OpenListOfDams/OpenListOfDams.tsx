@@ -5,17 +5,17 @@ import { useNavigate } from 'react-router-dom';
 import './OpenListOfDams.scss';
 
 const OpenListOfDams: React.FC = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const handleClick = () => {
-        navigate('/damlist');
-    };
+  const handleClick = () => {
+    navigate('/damlist');
+  };
 
-    return (
-        <div className="open-list-of-dams">
-            <button onClick={handleClick}>Open List of Dams</button>
-        </div>
-    );
+  return (
+    <div className="open-list-of-dams">
+      <button onClick={handleClick}>Open List of Dams</button>
+    </div>
+  );
 };
 
 export default OpenListOfDams;

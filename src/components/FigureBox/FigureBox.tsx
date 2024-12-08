@@ -6,19 +6,19 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 interface FigureBoxProps {
-    title: string;
-    data: string | null;
+  title: string;
+  data: string | null;
 }
 
 const FigureBox: React.FC<FigureBoxProps> = ({ title, data }) => {
-    return (
-        <div className="figure-box">
-            <div className="figure-box-title">{title}</div>
-            <div className="figure-box-data">
-                {data !== null ? data : <FontAwesomeIcon icon={faSpinner} spin />}
-            </div>
-        </div>
-    );
+  return (
+    <div className="figure-box">
+      <div className="figure-box-title">{title}</div>
+      <div className="figure-box-data">
+        {data !== null ? data : <FontAwesomeIcon icon={faSpinner} spin />}
+      </div>
+    </div>
+  );
 };
 
 export default FigureBox;
