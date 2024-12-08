@@ -7,9 +7,9 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // import DamListPage from './pages/DamListPage/DamListPage';
 // import PageTwo from './pages/PageTwo/PageTwo';
 // import PageThree from './pages/PageThree/PageThree';
-// import PageFour from './pages/PageFour/PageFour';
-// import PageFive from './pages/PageFive/PageFive';
-// import Footer from './components/Footer/Footer';
+import PageFour from './pages/PageFour/PageFour';
+import PageFive from './pages/PageFive/PageFive';
+import Footer from './components/Footer/Footer';
 import ApiConnectionPage from './pages/ApiConnectionPage/ApiConnectionPage'; // Import the new page
 import TestingPage from './pages/TestingPage/TestingPage'; // Import the new page
 import { Provider } from 'react-redux'; // Added Provider for Redux
@@ -29,9 +29,9 @@ const App: React.FC = () => {
                                 {/* <HomePage /> */}
                                 {/* <PageTwo /> */}
                                 {/* <PageThree /> */}
-                                {/* <PageFour /> */}
-                                {/* <PageFive /> */}
-                                {/* <Footer /> */}
+                                <PageFour />
+                                <PageFive />
+                                <Footer />
                             </div>
                         } />
                         {/* <Route path="/dam" element={<SelectedDamPage />} />

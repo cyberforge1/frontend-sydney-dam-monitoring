@@ -1,14 +1,11 @@
-// src/pages/SelectedDamPage/SelectedDamPage.tsx
+// # src/pages/SelectedDamPage/SelectedDamPage.tsx
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { 
-    fetchDamDataByName, 
-    fetchDamResources,
-    fetchAvgPercentageFull12MonthsById,
-    fetchAvgPercentageFull5YearsById,
-    fetchAvgPercentageFull20YearsById
-} from '../../services/api';
+import { useSelector, useDispatch } from 'react-redux';
+import { AppDispatch, RootState } from '../../store/store';
+import { fetchDamByIdThunk } from '../../features/dams/damsSlice';
+import { fetchSpecificDamAnalysisByIdThunk } from '../../features/damResources/damResourcesSlice';
 import DamContent from '../../components/DamContent/DamContent';
 import GoogleMapComponent from '../../components/GoogleMapComponent/GoogleMapComponent';
 import DamCapacityGraph from '../../graphs/DamCapacityGraph/DamCapacityGraph';
@@ -18,69 +15,46 @@ import './SelectedDamPage.scss';
 const SelectedDamPage: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const [damData, setDamData] = useState<any>(location.state?.damData);
-    const [damResources, setDamResources] = useState<any[]>([]);
-    const [avgPercentageFull12Months, setAvgPercentageFull12Months] = useState<number | null>(null);
-    const [avgPercentageFull5Years, setAvgPercentageFull5Years] = useState<number | null>(null);
-    const [avgPercentageFull20Years, setAvgPercentageFull20Years] = useState<number | null>(null);
+    const dispatch = useDispatch<AppDispatch>();
+
+    const { selectedDam, status: damStatus, error: damError } = useSelector((state: RootState) => state.dams);
+    const { specificDamAnalyses, status: resourceStatus, error: resourceError } = useSelector((state: RootState) => state.damResources);
+
+    const damId = location.state?.damData?.dam_id || location.state?.damId;
 
     useEffect(() => {
-        if (!damData && location.state?.damName) {
-            const loadDamData = async () => {
-                try {
-                    const data = await fetchDamDataByName(location.state.damName);
-                    setDamData(data);
-                } catch (error) {
-                    console.error('Error fetching dam data:', error);
-                }
-            };
-
-            loadDamData();
+        if (damId && damStatus === 'idle') {
+            dispatch(fetchDamByIdThunk(damId));
         }
-    }, [damData, location.state?.damName]);
 
-    useEffect(() => {
-        if (damData) {
-            const loadDamResources = async () => {
-                try {
-                    const resources = await fetchDamResources(damData.dam_id);
-                    setDamResources(resources);
-                } catch (error) {
-                    console.error('Error fetching dam resources:', error);
-                }
-            };
-
-            const loadAvgPercentageFullData = async () => {
-                try {
-                    const avg12Months = await fetchAvgPercentageFull12MonthsById(damData.dam_id);
-                    setAvgPercentageFull12Months(avg12Months);
-
-                    const avg5Years = await fetchAvgPercentageFull5YearsById(damData.dam_id);
-                    setAvgPercentageFull5Years(avg5Years);
-
-                    const avg20Years = await fetchAvgPercentageFull20YearsById(damData.dam_id);
-                    setAvgPercentageFull20Years(avg20Years);
-                } catch (error) {
-                    console.error('Error fetching average percentage full data:', error);
-                }
-            };
-
-            loadDamResources();
-            loadAvgPercentageFullData();
+        if (damId && resourceStatus === 'idle') {
+            dispatch(fetchSpecificDamAnalysisByIdThunk(damId));
         }
-    }, [damData]);
+    }, [damId, damStatus, resourceStatus, dispatch]);
 
-    if (!damData) {
+    if (damStatus === 'loading' || resourceStatus === 'loading') {
         return <div>Loading...</div>;
     }
+
+    if (damError || resourceError) {
+        return <div>Error: {damError || resourceError}</div>;
+    }
+
+    if (!selectedDam) {
+        return <div>No dam data available.</div>;
+    }
+
+    const damName = selectedDam.dam_name;
+    const latitude = selectedDam.latitude ? selectedDam.latitude.toString() : '0';
+    const longitude = selectedDam.longitude ? selectedDam.longitude.toString() : '0';
+
+    const avgPercentageFull12Months = specificDamAnalyses[0]?.avg_percentage_full_12_months || null;
+    const avgPercentageFull5Years = specificDamAnalyses[0]?.avg_percentage_full_5_years || null;
+    const avgPercentageFull20Years = specificDamAnalyses[0]?.avg_percentage_full_20_years || null;
 
     const handleBackClick = () => {
         navigate('/');
     };
-
-    const damName = damData.dam_name;
-    const latitude = parseFloat(damData.latitude);
-    const longitude = parseFloat(damData.longitude);
 
     return (
         <div className="selected-dam-page">
@@ -90,14 +64,14 @@ const SelectedDamPage: React.FC = () => {
             </div>
             <div className="content-row">
                 <div className="dam-content">
-                    <DamCapacityGraph data={damResources} damName={damName} />
+                    <DamCapacityGraph damId={damId} />
                 </div>
                 <div className="dam-content">
-                    <NetInflowReleaseGraph data={damResources} damName={damName} />
+                    <NetInflowReleaseGraph damId={damId} />
                 </div>
             </div>
             <div className="content-row">
-                <DamContent content="">
+                <DamContent>
                     <div style={{ 
                         display: 'flex', 
                         flexDirection: 'column', 
@@ -141,7 +115,7 @@ const SelectedDamPage: React.FC = () => {
                     </div>
                 </DamContent>
                 <div className="dam-content">
-                    <GoogleMapComponent lat={latitude} lng={longitude} />
+                    <GoogleMapComponent lat={parseFloat(latitude)} lng={parseFloat(longitude)} />
                 </div>
             </div>
         </div>

@@ -1,7 +1,7 @@
 // # src/pages/TestingPage/TestingPage.tsx
 
 import React from 'react';
-// import HomePage from '../../pages/HomePage/HomePage';
+import HomePage from '../../pages/HomePage/HomePage';
 // import DamListPage from '../../pages/DamListPage/DamListPage';
 // import DamStorageGraph from '../../graphs/DamStorageGraph/DamStorageGraph';
 // import NetInflowReleaseGraph from '../../graphs/NetInflowReleaseGraph/NetInflowReleaseGraph';
@@ -17,17 +17,17 @@ import React from 'react';
 // import IndividualDamCard from '../../components/IndividualDamCard/IndividualDamCard';
 // import DamContent from '../../components/DamContent/DamContent';
 // import DamGroupSelector from '../../components/DamGroupSelector/DamGroupSelector';
-import PageFive from '../../pages/PageFive/PageFive';
+// import PageFour from '../../pages/PageFour/PageFour';
 import './TestingPage.scss';
 
 const TestingPage: React.FC = () => {
     return (
         <div className="testing-page">
-            {/* Testing the new PageFive component */}
-            <PageFive />
+            {/* Testing the new PageFour component */}
+            <HomePage />
 
+            {/* <PageFour /> */}
             {/* Commented out older components for isolated testing */}
-            {/* <HomePage /> */}
             {/* <DamListPage /> */}
             {/* <DamStorageGraph /> */}
             {/* <NetInflowReleaseGraph damId="210102" /> */}

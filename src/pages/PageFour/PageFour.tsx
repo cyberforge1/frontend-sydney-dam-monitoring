@@ -9,7 +9,7 @@ import './PageFour.scss';
 
 const PageFour: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const { latestData, status, error } = useSelector((state: RootState) => state.damResources);
+    const { overallDamAnalysis, status, error } = useSelector((state: RootState) => state.damResources);
 
     useEffect(() => {
         if (status === 'idle') {
@@ -25,13 +25,13 @@ const PageFour: React.FC = () => {
         return <div>Error: {error}</div>;
     }
 
-    if (latestData.length === 0) {
+    if (overallDamAnalysis.length === 0) {
         return <div>No data available.</div>;
     }
 
-    const avg12Months = latestData[0]?.avg_percentage_full_12_months?.toFixed(2) + '%' || null;
-    const avg5Years = latestData[0]?.avg_percentage_full_5_years?.toFixed(2) + '%' || null;
-    const avg20Years = latestData[0]?.avg_percentage_full_20_years?.toFixed(2) + '%' || null;
+    const avg12Months = overallDamAnalysis[0]?.avg_percentage_full_12_months?.toFixed(2) + '%' || null;
+    const avg5Years = overallDamAnalysis[0]?.avg_percentage_full_5_years?.toFixed(2) + '%' || null;
+    const avg20Years = overallDamAnalysis[0]?.avg_percentage_full_20_years?.toFixed(2) + '%' || null;
 
     return (
         <div className="page-four">

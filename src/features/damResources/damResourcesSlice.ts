@@ -1,102 +1,125 @@
-// src/features/damResources/damResourcesSlice.ts
+// # src/features/damResources/damResourcesSlice.ts
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {
-  fetchLatestDataById,
-  fetchAllLatestData,
-  fetchSpecificDamAnalysisById,
+    fetchLatestDataById,
+    fetchAllLatestData,
+    fetchSpecificDamAnalysisById,
+    fetchAllOverallDamAnalyses, // Import new API
 } from '../../api/api';
-import { DamResource, DamAnalysis } from '../../types/types';
+import { DamResource, DamAnalysis, OverallDamAnalysis } from '../../types/types';
 
 // Define the state interface
 export interface DamResourcesState {
-  latestData: DamResource[];
-  specificDamAnalyses: DamAnalysis[];
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
-  error: string | null;
+    latestData: DamResource[];
+    specificDamAnalyses: DamAnalysis[];
+    overallDamAnalysis: OverallDamAnalysis[]; // New property for overall dam analyses
+    status: 'idle' | 'loading' | 'succeeded' | 'failed';
+    error: string | null;
 }
 
 const initialState: DamResourcesState = {
-  latestData: [],
-  specificDamAnalyses: [],
-  status: 'idle',
-  error: null,
+    latestData: [],
+    specificDamAnalyses: [],
+    overallDamAnalysis: [], // Initialize with empty array
+    status: 'idle',
+    error: null,
 };
 
-// Thunk to fetch all latest dam data
+// Thunk to fetch all overall dam analyses
+export const fetchAllOverallDamAnalysesThunk = createAsyncThunk<OverallDamAnalysis[], void>(
+    'damResources/fetchAllOverallDamAnalyses',
+    async () => {
+        const response = await fetchAllOverallDamAnalyses();
+        return response;
+    }
+);
+
+// Existing thunks...
 export const fetchAllLatestDataThunk = createAsyncThunk<DamResource[], void>(
-  'damResources/fetchAllLatestData',
-  async () => {
-    const response = await fetchAllLatestData();
-    return response;
-  }
+    'damResources/fetchAllLatestData',
+    async () => {
+        const response = await fetchAllLatestData();
+        return response;
+    }
 );
 
-// Thunk to fetch latest data by dam ID
 export const fetchLatestDataByIdThunk = createAsyncThunk<DamResource, string>(
-  'damResources/fetchLatestDataById',
-  async (damId: string) => {
-    const response = await fetchLatestDataById(damId);
-    return response;
-  }
+    'damResources/fetchLatestDataById',
+    async (damId: string) => {
+        const response = await fetchLatestDataById(damId);
+        return response;
+    }
 );
 
-// Thunk to fetch specific dam analysis by dam ID
 export const fetchSpecificDamAnalysisByIdThunk = createAsyncThunk<
-  DamAnalysis[],
-  string
+    DamAnalysis[],
+    string
 >('damResources/fetchSpecificDamAnalysisById', async (damId: string) => {
-  const response = await fetchSpecificDamAnalysisById(damId);
-  return response;
+    const response = await fetchSpecificDamAnalysisById(damId);
+    return response;
 });
 
+// Redux slice
 const damResourcesSlice = createSlice({
-  name: 'damResources',
-  initialState,
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchAllLatestDataThunk.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(fetchAllLatestDataThunk.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.latestData = action.payload;
-      })
-      .addCase(fetchAllLatestDataThunk.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message || 'Failed to fetch latest dam data';
-      })
-      .addCase(fetchLatestDataByIdThunk.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(fetchLatestDataByIdThunk.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        const index = state.latestData.findIndex(
-          (data) => data.dam_id === action.payload.dam_id
-        );
-        if (index !== -1) {
-          state.latestData[index] = action.payload;
-        } else {
-          state.latestData.push(action.payload);
-        }
-      })
-      .addCase(fetchLatestDataByIdThunk.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message || 'Failed to fetch latest dam data by ID';
-      })
-      .addCase(fetchSpecificDamAnalysisByIdThunk.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(fetchSpecificDamAnalysisByIdThunk.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.specificDamAnalyses = action.payload;
-      })
-      .addCase(fetchSpecificDamAnalysisByIdThunk.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message || 'Failed to fetch specific dam analysis';
-      });
-  },
+    name: 'damResources',
+    initialState,
+    reducers: {},
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchAllOverallDamAnalysesThunk.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchAllOverallDamAnalysesThunk.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.overallDamAnalysis = action.payload;
+            })
+            .addCase(fetchAllOverallDamAnalysesThunk.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message || 'Failed to fetch overall dam analyses';
+            })
+            // Existing reducers for other thunks
+            .addCase(fetchAllLatestDataThunk.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchAllLatestDataThunk.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.latestData = action.payload;
+            })
+            .addCase(fetchAllLatestDataThunk.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message || 'Failed to fetch latest dam data';
+            })
+            .addCase(fetchLatestDataByIdThunk.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchLatestDataByIdThunk.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                const index = state.latestData.findIndex(
+                    (data) => data.dam_id === action.payload.dam_id
+                );
+                if (index !== -1) {
+                    state.latestData[index] = action.payload;
+                } else {
+                    state.latestData.push(action.payload);
+                }
+            })
+            .addCase(fetchLatestDataByIdThunk.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message || 'Failed to fetch latest dam data by ID';
+            })
+            .addCase(fetchSpecificDamAnalysisByIdThunk.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchSpecificDamAnalysisByIdThunk.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.specificDamAnalyses = action.payload;
+            })
+            .addCase(fetchSpecificDamAnalysisByIdThunk.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message || 'Failed to fetch specific dam analysis';
+            });
+    },
 });
 
 export default damResourcesSlice.reducer;
