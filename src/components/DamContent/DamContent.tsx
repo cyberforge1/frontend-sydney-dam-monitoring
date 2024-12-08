@@ -1,4 +1,4 @@
-// # src/components/DamContent/DamContent.tsx
+// src/components/DamContent/DamContent.tsx
 
 import React from 'react';
 import './DamContent.scss';

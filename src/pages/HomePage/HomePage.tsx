@@ -1,57 +1,57 @@
-// # src/pages/HomePage/HomePage.tsx
+// src/pages/HomePage/HomePage.tsx
 
 import React, { useState, useEffect } from 'react';
 import TopDamsPieCharts from '../../containers/TopDamsPieCharts/TopDamsPieCharts';
 import DamGroupSelector from '../../components/DamGroupSelector/DamGroupSelector';
 import SearchForDam from '../../components/SearchForDam/SearchForDam';
 import OpenListOfDams from '../../components/OpenListOfDams/OpenListOfDams';
-import { fetchDamsDataByGroup } from '../../services/api'; // Use the updated API
+import { fetchDamsByGroupName, fetchLatestDataById } from '../../services/api'; // Use the updated API functions
 import './HomePage.scss';
-
-// Define a type for the dam data
-interface Dam {
-    dam_id: string;
-    dam_name: string;
-    full_volume?: number;
-    latitude?: number;
-    longitude?: number;
-    percentage_full?: number;
-    storage_volume?: number;
-}
-
-// Define a stricter type for TopDamsPieCharts
-interface DamData {
-    dam_id: string;
-    dam_name: string;
-    percentage_full: number; // Strictly a number
-}
 
 const HomePage: React.FC = () => {
     // State to manage the selected group
     const [selectedGroup, setSelectedGroup] = useState<string>('sydney_dams');
-    // State to hold dam data for the selected group
-    const [damData, setDamData] = useState<Dam[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     // Effect to fetch dam data whenever the selected group changes
     useEffect(() => {
         const fetchDamData = async () => {
+            setLoading(true);
+            setError(null);
             try {
-                const data = await fetchDamsDataByGroup(selectedGroup); // Fetch dam data using the updated API
-                setDamData(data); // Update state with fetched data
-            } catch (error) {
-                console.error('Error fetching dam data by group:', error); // Log any errors
+                const dams = await fetchDamsByGroupName(selectedGroup); // Fetch dams using the updated API
+                // For each dam, fetch latest data
+                const damDataPromises = dams.map(async (dam) => {
+                    try {
+                        const latestData = await fetchLatestDataById(dam.dam_id);
+                        return {
+                            dam_id: dam.dam_id,
+                            dam_name: dam.dam_name,
+                            percentage_full: latestData.percentage_full ?? 0, // Default to 0 if undefined
+                        };
+                    } catch (err) {
+                        console.error(`Error fetching latest data for dam ${dam.dam_id}:`, err);
+                        return {
+                            dam_id: dam.dam_id,
+                            dam_name: dam.dam_name,
+                            percentage_full: 0,
+                        };
+                    }
+                });
+
+                const combinedDamData = await Promise.all(damDataPromises);
+                // damData is fetched but not used. If you don't need it, you can remove the state and related code.
+                setLoading(false);
+            } catch (err) {
+                console.error('Error fetching dams by group:', err);
+                setError('Failed to load dam data.');
+                setLoading(false);
             }
         };
 
         fetchDamData();
     }, [selectedGroup]);
-
-    // Ensure damData conforms to DamData
-    const validatedDamData: DamData[] = damData.map(dam => ({
-        dam_id: dam.dam_id,
-        dam_name: dam.dam_name,
-        percentage_full: dam.percentage_full ?? 0, // Default to 0 if undefined
-    }));
 
     // Render the component
     return (
@@ -69,7 +69,13 @@ const HomePage: React.FC = () => {
             </div>
             {/* Charts section */}
             <div className="top-dams-pie-charts-container">
-                <TopDamsPieCharts damData={validatedDamData} />
+                {loading ? (
+                    <div>Loading top dams...</div>
+                ) : error ? (
+                    <div className="error">{error}</div>
+                ) : (
+                    <TopDamsPieCharts /> {/* Removed damData prop */}
+                )}
             </div>
         </div>
     );

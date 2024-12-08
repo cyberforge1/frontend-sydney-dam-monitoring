@@ -1,4 +1,4 @@
-// # src/components/FigureBox/FigureBox.tsx
+// src/components/FigureBox/FigureBox.tsx
 
 import React from 'react';
 import './FigureBox.scss';

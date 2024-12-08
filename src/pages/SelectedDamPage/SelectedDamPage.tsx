@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-    fetchDamDataByName,
     fetchDamResources,
     fetchAvgPercentageFull12MonthsById,
     fetchAvgPercentageFull5YearsById,
@@ -41,14 +40,8 @@ const SelectedDamPage: React.FC = () => {
         avg5Years: null,
         avg20Years: null,
     });
-
-    useEffect(() => {
-        if (!damData && location.state?.damName) {
-            fetchDamDataByName(location.state.damName)
-                .then(data => setDamData(data[0]))
-                .catch(error => console.error('Error fetching dam data:', error));
-        }
-    }, [damData, location.state?.damName]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         if (damData) {
@@ -70,16 +63,30 @@ const SelectedDamPage: React.FC = () => {
                     ]);
                     setDamResources(resources);
                     setAvgData({ avg12Months: avg12, avg5Years: avg5, avg20Years: avg20 });
+                    setLoading(false);
                 } catch (error) {
                     console.error('Error fetching dam details:', error);
+                    setError('Failed to load dam details.');
+                    setLoading(false);
                 }
             };
             fetchData();
+        } else {
+            setLoading(false);
+            setError('No dam data available.');
         }
     }, [damData]);
 
+    if (loading) {
+        return <div className="selected-dam-page">Loading dam details...</div>;
+    }
+
+    if (error) {
+        return <div className="selected-dam-page error">{error}</div>;
+    }
+
     if (!damData) {
-        return <div>Loading...</div>;
+        return <div className="selected-dam-page">No dam data available.</div>;
     }
 
     const handleBackClick = () => {

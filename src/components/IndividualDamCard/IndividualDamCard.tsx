@@ -1,4 +1,4 @@
-// # src/components/IndividualDamCard/IndividualDamCard.tsx
+// src/components/IndividualDamCard/IndividualDamCard.tsx
 
 import React from 'react';
 import { Pie } from 'react-chartjs-2';

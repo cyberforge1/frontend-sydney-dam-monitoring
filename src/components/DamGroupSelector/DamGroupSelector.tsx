@@ -1,34 +1,72 @@
-// # src/components/DamGroupSelector/DamGroupSelector.tsx
+// src/components/DamGroupSelector/DamGroupSelector.tsx
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './DamGroupSelector.scss';
+import { fetchAllDamGroups } from '../../services/api';
+
+interface DamGroup {
+    group_name: string;
+}
 
 interface DamGroupSelectorProps {
     onSelectGroup: (group: string) => void;
 }
 
-const groups = [
-    { value: 'sydney_dams', label: 'Sydney Dams' },
-    { value: 'popular_dams', label: 'Popular Dams' },
-    { value: 'large_dams', label: 'Large Dams' },
-    { value: 'small_dams', label: 'Small Dams' },
-    { value: 'greatest_released', label: 'Highest Flow' },
-];
-
 const DamGroupSelector: React.FC<DamGroupSelectorProps> = ({ onSelectGroup }) => {
-    const [currentGroup, setCurrentGroup] = useState(groups[0]);
+    const [groups, setGroups] = useState<DamGroup[]>([]);
+    const [currentGroup, setCurrentGroup] = useState<string>('');
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const loadGroups = async () => {
+            try {
+                const fetchedGroups = await fetchAllDamGroups();
+                setGroups(fetchedGroups);
+                if (fetchedGroups.length > 0) {
+                    setCurrentGroup(fetchedGroups[0].group_name);
+                    onSelectGroup(fetchedGroups[0].group_name);
+                }
+                setLoading(false);
+            } catch (err) {
+                console.error('Error fetching dam groups:', err);
+                setError('Failed to load dam groups.');
+                setLoading(false);
+            }
+        };
+
+        loadGroups();
+    }, [onSelectGroup]);
 
     const handleClick = () => {
-        const currentIndex = groups.findIndex(group => group.value === currentGroup.value);
+        if (groups.length === 0) return;
+
+        const currentIndex = groups.findIndex(group => group.group_name === currentGroup);
         const nextIndex = (currentIndex + 1) % groups.length;
-        const nextGroup = groups[nextIndex];
+        const nextGroup = groups[nextIndex].group_name;
         setCurrentGroup(nextGroup);
-        onSelectGroup(nextGroup.value);
+        onSelectGroup(nextGroup);
     };
+
+    const getLabel = (groupName: string): string => {
+        // Convert snake_case to Title Case for display
+        return groupName
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    };
+
+    if (loading) {
+        return <div className="dam-group-selector">Loading groups...</div>;
+    }
+
+    if (error) {
+        return <div className="dam-group-selector error">{error}</div>;
+    }
 
     return (
         <div className="dam-group-selector">
-            <button onClick={handleClick}>{currentGroup.label}</button>
+            <button onClick={handleClick}>{getLabel(currentGroup)}</button>
         </div>
     );
 };

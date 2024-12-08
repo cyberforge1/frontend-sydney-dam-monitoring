@@ -1,4 +1,4 @@
-// # src/components/OpenListOfDams/OpenListOfDams.tsx
+// src/components/OpenListOfDams/OpenListOfDams.tsx
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';

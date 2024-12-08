@@ -1,4 +1,4 @@
-// # src/graphs/DamCapacityPercentageGraph/DamCapacityPercentageGraph.tsx
+// src/graphs/DamCapacityPercentageGraph/DamCapacityPercentageGraph.tsx
 
 import React from 'react';
 import { Line } from 'react-chartjs-2';

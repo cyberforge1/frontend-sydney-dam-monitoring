@@ -1,23 +1,31 @@
-// # src/components/SearchForDam/SearchForDam.tsx
+// src/components/SearchForDam/SearchForDam.tsx
 
 import React, { useState, useEffect } from 'react';
-import { fetchDamNames, fetchDamDataByName } from '../../services/api';
+import { fetchAllDams, fetchDamById } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 import './SearchForDam.scss';
 
+interface Dam {
+    dam_id: string;
+    dam_name: string;
+    full_volume?: number;
+    latitude?: number;
+    longitude?: number;
+}
+
 const SearchForDam: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState<string>('');
-    const [damNames, setDamNames] = useState<string[]>([]); // Now utilized
-    const [filteredDams, setFilteredDams] = useState<string[]>([]); // Now utilized
+    const [damNames, setDamNames] = useState<Dam[]>([]);
+    const [filteredDams, setFilteredDams] = useState<Dam[]>([]);
     const navigate = useNavigate();
 
     useEffect(() => {
         const loadDamNames = async () => {
             try {
-                const names = await fetchDamNames();
-                setDamNames(names);
+                const dams = await fetchAllDams();
+                setDamNames(dams);
             } catch (error) {
-                console.error('Error fetching dam names:', error);
+                console.error('Error fetching dams:', error);
             }
         };
 
@@ -26,10 +34,10 @@ const SearchForDam: React.FC = () => {
 
     useEffect(() => {
         if (searchQuery) {
-            // Use `damNames` to filter results based on the search query
+            // Filter dams based on the search query
             setFilteredDams(
                 damNames.filter((dam) =>
-                    dam.toLowerCase().includes(searchQuery.toLowerCase())
+                    dam.dam_name.toLowerCase().includes(searchQuery.toLowerCase())
                 )
             );
         } else {
@@ -41,12 +49,13 @@ const SearchForDam: React.FC = () => {
         setSearchQuery(e.target.value);
     };
 
-    const handleSuggestionClick = async (damName: string) => {
+    const handleSuggestionClick = async (dam: Dam) => {
         try {
-            const data = await fetchDamDataByName(damName);
-            navigate('/dam', { state: { damData: data[0] } });
+            // Assuming you want to navigate to a detailed view of the dam
+            const damDetails = await fetchDamById(dam.dam_id);
+            navigate('/dam', { state: { damData: damDetails } });
         } catch (error) {
-            console.error('Error fetching dam data:', error);
+            console.error('Error fetching dam details:', error);
         }
     };
 
@@ -61,9 +70,9 @@ const SearchForDam: React.FC = () => {
                 />
                 {filteredDams.length > 0 && (
                     <ul className="suggestions-list">
-                        {filteredDams.map((dam, index) => (
-                            <li key={index} onClick={() => handleSuggestionClick(dam)}>
-                                {dam}
+                        {filteredDams.map((dam) => (
+                            <li key={dam.dam_id} onClick={() => handleSuggestionClick(dam)}>
+                                {dam.dam_name}
                             </li>
                         ))}
                     </ul>

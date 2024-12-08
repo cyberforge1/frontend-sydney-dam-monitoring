@@ -2,7 +2,6 @@
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 
-
 // Define interfaces for better type safety
 interface Dam {
     dam_id: string;
@@ -39,24 +38,6 @@ interface DamAnalysis {
     avg_storage_release_20_years?: number;
 }
 
-// Centralized data transformation and validation
-const validateDamResources = (resources: DamResource[]): DamResource[] =>
-    resources
-        .filter(
-            resource =>
-                resource.percentage_full !== undefined &&
-                resource.storage_volume !== undefined &&
-                resource.storage_inflow !== undefined &&
-                resource.storage_release !== undefined
-        )
-        .map(resource => ({
-            ...resource,
-            percentage_full: resource.percentage_full!,
-            storage_volume: resource.storage_volume!,
-            storage_inflow: resource.storage_inflow!,
-            storage_release: resource.storage_release!,
-        }));
-
 // Helper function for making API calls
 const apiFetch = async <T>(endpoint: string): Promise<T> => {
     try {
@@ -74,50 +55,69 @@ const apiFetch = async <T>(endpoint: string): Promise<T> => {
 // API Methods
 export const fetchHelloWorld = async (): Promise<string> => apiFetch<string>('/');
 
+export const fetchAllDams = async (): Promise<Dam[]> =>
+    apiFetch<Dam[]>('/dams/');
+
+export const fetchDamById = async (damId: string): Promise<Dam> =>
+    apiFetch<Dam>(`/dams/${damId}`);
+
+export const fetchAllLatestData = async (): Promise<DamResource[]> =>
+    apiFetch<DamResource[]>('/latest_data/');
+
 export const fetchLatestDataById = async (damId: string): Promise<DamResource> =>
     apiFetch<DamResource>(`/latest_data/${damId}`);
 
-export const fetchDamsDataByGroup = async (groupName: string): Promise<Dam[]> =>
+export const fetchAllDamResources = async (): Promise<DamResource[]> =>
+    apiFetch<DamResource[]>('/dam_resources/');
+
+export const fetchDamResourceById = async (resourceId: number): Promise<DamResource> =>
+    apiFetch<DamResource>(`/dam_resources/${resourceId}`);
+
+export const fetchAllSpecificDamAnalyses = async (): Promise<DamAnalysis[]> =>
+    apiFetch<DamAnalysis[]>('/specific_dam_analysis/');
+
+export const fetchSpecificDamAnalysisById = async (damId: string): Promise<DamAnalysis[]> =>
+    apiFetch<DamAnalysis[]>(`/specific_dam_analysis/${damId}`);
+
+export const fetchAllOverallDamAnalyses = async (): Promise<DamAnalysis[]> =>
+    apiFetch<DamAnalysis[]>('/overall_dam_analysis/');
+
+export const fetchOverallDamAnalysisByDate = async (date: string): Promise<DamAnalysis> =>
+    apiFetch<DamAnalysis>(`/overall_dam_analysis/${date}`);
+
+export const fetchAllDamGroups = async (): Promise<{ group_name: string }[]> =>
+    apiFetch<{ group_name: string }[]>('/dam_groups/');
+
+export const fetchDamsByGroupName = async (groupName: string): Promise<Dam[]> =>
     apiFetch<Dam[]>(`/dam_groups/${groupName}`);
 
-export const fetchDamNames = async (): Promise<string[]> =>
-    apiFetch<Dam[]>(`/dams/`).then(data => data.map(dam => dam.dam_name));
+export const fetchAllDamGroupMembers = async (): Promise<{ group_name: string; dam_id: string }[]> =>
+    apiFetch<{ group_name: string; dam_id: string }[]>('/dam_group_members/');
 
-export const fetchDamDataByName = async (damName: string): Promise<Dam[]> =>
-    apiFetch<Dam[]>(`/dams?dam_name=${encodeURIComponent(damName)}`);
+export const fetchDamGroupMembersByGroupName = async (groupName: string): Promise<{ group_name: string; dam_id: string }[]> =>
+    apiFetch<{ group_name: string; dam_id: string }[]>(`/dam_group_members/${groupName}`);
 
-export const fetchDamResources = async (damId: string): Promise<DamResource[]> =>
-    apiFetch<DamResource[]>(`/dam_resources/${damId}`).then(validateDamResources);
+// Additional API Methods (Ensure these exist in your Flask backend)
+export const fetchAvgPercentageFull12Months = async (): Promise<number> => {
+    return apiFetch<number>('/overall_dam_analysis/12_months');
+};
 
-export const fetchAvgPercentageFull12Months = async (): Promise<number> =>
-    apiFetch<{ avg_percentage_full_12_months: number }>(`/overall_dam_analysis`).then(
-        data => data.avg_percentage_full_12_months
-    );
+export const fetchAvgPercentageFull5Years = async (): Promise<number> => {
+    return apiFetch<number>('/overall_dam_analysis/5_years');
+};
 
-export const fetchAvgPercentageFull5Years = async (): Promise<number> =>
-    apiFetch<{ avg_percentage_full_5_years: number }>(`/overall_dam_analysis`).then(
-        data => data.avg_percentage_full_5_years
-    );
+export const fetchAvgPercentageFull20Years = async (): Promise<number> => {
+    return apiFetch<number>('/overall_dam_analysis/20_years');
+};
 
-export const fetchAvgPercentageFull20Years = async (): Promise<number> =>
-    apiFetch<{ avg_percentage_full_20_years: number }>(`/overall_dam_analysis`).then(
-        data => data.avg_percentage_full_20_years
-    );
+export const fetchAvgPercentageFull12MonthsById = async (damId: string): Promise<number> => {
+    return apiFetch<number>(`/specific_dam_analysis/${damId}/avg_percentage_full/12_months`);
+};
 
-export const fetchAvgPercentageFull12MonthsById = async (damId: string): Promise<number> =>
-    apiFetch<{ avg_percentage_full_12_months: number }>(`/specific_dam_analysis/${damId}`).then(
-        data => data.avg_percentage_full_12_months
-    );
+export const fetchAvgPercentageFull5YearsById = async (damId: string): Promise<number> => {
+    return apiFetch<number>(`/specific_dam_analysis/${damId}/avg_percentage_full/5_years`);
+};
 
-export const fetchAvgPercentageFull5YearsById = async (damId: string): Promise<number> =>
-    apiFetch<{ avg_percentage_full_5_years: number }>(`/specific_dam_analysis/${damId}`).then(
-        data => data.avg_percentage_full_5_years
-    );
-
-export const fetchAvgPercentageFull20YearsById = async (damId: string): Promise<number> =>
-    apiFetch<{ avg_percentage_full_20_years: number }>(`/specific_dam_analysis/${damId}`).then(
-        data => data.avg_percentage_full_20_years
-    );
-
-export const fetchDamData12Months = async (groupName: string): Promise<DamAnalysis[]> =>
-    apiFetch<DamAnalysis[]>(`/overall_dam_analysis/12_months/${groupName}`);
+export const fetchAvgPercentageFull20YearsById = async (damId: string): Promise<number> => {
+    return apiFetch<number>(`/specific_dam_analysis/${damId}/avg_percentage_full/20_years`);
+};

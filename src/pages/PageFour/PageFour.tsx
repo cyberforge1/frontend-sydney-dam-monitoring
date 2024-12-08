@@ -1,4 +1,4 @@
-// # src/pages/PageFour/PageFour.tsx
+// src/pages/PageFour/PageFour.tsx
 
 import React, { useEffect, useState } from 'react';
 import FigureBox from '../../components/FigureBox/FigureBox';
@@ -9,25 +9,38 @@ const PageFour: React.FC = () => {
     const [avg12Months, setAvg12Months] = useState<string | null>(null);
     const [avg5Years, setAvg5Years] = useState<string | null>(null);
     const [avg20Years, setAvg20Years] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data12Months = await fetchAvgPercentageFull12Months();
-                setAvg12Months(data12Months.toFixed(2) + '%');
-
-                const data5Years = await fetchAvgPercentageFull5Years();
-                setAvg5Years(data5Years.toFixed(2) + '%');
-
-                const data20Years = await fetchAvgPercentageFull20Years();
-                setAvg20Years(data20Years.toFixed(2) + '%');
+                const [data12Months, data5Years, data20Years] = await Promise.all([
+                    fetchAvgPercentageFull12Months(),
+                    fetchAvgPercentageFull5Years(),
+                    fetchAvgPercentageFull20Years(),
+                ]);
+                setAvg12Months(`${data12Months.toFixed(2)}%`);
+                setAvg5Years(`${data5Years.toFixed(2)}%`);
+                setAvg20Years(`${data20Years.toFixed(2)}%`);
+                setLoading(false);
             } catch (error) {
                 console.error('Error fetching data:', error);
+                setError('Failed to load average percentage full data.');
+                setLoading(false);
             }
         };
 
         fetchData();
     }, []);
+
+    if (loading) {
+        return <div className="page-four">Loading average data...</div>;
+    }
+
+    if (error) {
+        return <div className="page-four error">{error}</div>;
+    }
 
     return (
         <div className="page-four">
