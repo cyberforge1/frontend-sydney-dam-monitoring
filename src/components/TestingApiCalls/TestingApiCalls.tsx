@@ -25,15 +25,20 @@ const TestingApiCalls: React.FC = () => {
 
   const handleApiCall = async (apiFn: (...args: string[]) => Promise<unknown>, params: string[] = []) => {
     try {
+      if (params.some(param => !param)) {
+        setOutput('Error: Missing or invalid input value');
+        return;
+      }
       const result = await apiFn(...params);
       setOutput(JSON.stringify(result, null, 2));
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        setOutput(`Error: ${error.message}`);
-      } else {
-        setOutput('An unknown error occurred');
-      }
+      setOutput(error instanceof Error ? `Error: ${error.message}` : 'An unknown error occurred');
     }
+  };
+
+  const handleClear = () => {
+    setInputValue({}); // Clear all input fields
+    setOutput(''); // Clear the output field
   };
 
   return (
@@ -182,6 +187,11 @@ const TestingApiCalls: React.FC = () => {
             Fetch Overall Dam Analysis by Date
           </button>
         </div>
+      </div>
+
+      {/* Clear Button */}
+      <div className="clear-button">
+        <button onClick={handleClear}>Clear All</button>
       </div>
 
       {/* Display output */}

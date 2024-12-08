@@ -7,10 +7,10 @@ export default defineConfig({
       '/api': {
         target: 'http://127.0.0.1:5001',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        rewrite: (path) => path, // Keep the `/api` prefix in the URL
         configure: (proxy) => {
           proxy.on('proxyReq', (proxyReq, req) => {
-            console.log('Proxying request:', req.url);
+            console.log('Proxying request:', req.url); // This should log the full URL, including `/api/dams/203042`
           });
         },
       },

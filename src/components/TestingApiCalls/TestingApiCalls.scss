@@ -1,79 +1,80 @@
 // #src/components/TestingApiCalls/TestingApiCalls.scss
 
 .testing-api-calls {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 20px;
-  gap: 20px;
-
-  .api-buttons {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-
-    .api-call {
+    align-items: flex-start;
+    padding: 20px;
+    gap: 20px;
+  
+    .api-buttons {
       display: flex;
-      align-items: center;
-      gap: 15px;
-
-      input {
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        width: 200px;
+      flex-direction: column;
+      gap: 10px;
+  
+      .api-call {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+  
+        input {
+          padding: 8px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          width: 200px;
+        }
+  
+        button {
+          padding: 8px 12px;
+          background-color: #007bff;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+  
+          &:hover {
+            background-color: #0056b3;
+          }
+  
+          &:active {
+            background-color: #004080;
+          }
+        }
+  
+        pre {
+          background-color: #f9f9f9;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          padding: 10px;
+          white-space: pre-wrap;
+          overflow-x: auto;
+          font-family: monospace;
+          max-width: 300px; /* Adjust as needed */
+        }
       }
-
+    }
+  
+    .clear-button {
+      margin-top: 10px;
+  
       button {
-        padding: 8px 12px;
-        background-color: #007bff;
+        padding: 10px 15px;
+        background-color: #dc3545;
         color: white;
         border: none;
         border-radius: 4px;
         cursor: pointer;
         transition: background-color 0.3s ease;
-
+  
         &:hover {
-          background-color: #0056b3;
+          background-color: #c82333;
         }
-
+  
         &:active {
-          background-color: #004080;
+          background-color: #bd2130;
         }
       }
-
-      pre {
-        background-color: #f9f9f9;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        padding: 10px;
-        white-space: pre-wrap;
-        overflow-x: auto;
-        font-family: monospace;
-        max-width: 300px; /* Adjust as needed */
-      }
     }
   }
-
-  .clear-button {
-    margin-top: 10px;
-
-    button {
-      padding: 10px 15px;
-      background-color: #dc3545;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-
-      &:hover {
-        background-color: #c82333;
-      }
-
-      &:active {
-        background-color: #bd2130;
-      }
-    }
-  }
-}
+  
