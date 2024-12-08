@@ -9,9 +9,10 @@ export default defineConfig({
     server: {
         proxy: {
             '/api': {
-                target: 'http://127.0.0.1:5001', // Updated port to 5001
+                target: 'http://127.0.0.1:5001', // Flask backend URL
                 changeOrigin: true,
-                rewrite: (path) => path.replace(/^\/api/, ''),
+                // Remove rewrite to keep `/api` in the proxied requests
+                // rewrite: (path) => path.replace(/^\/api/, ''),
             },
         },
     },
