@@ -3,10 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-    fetchDamResources,
     fetchAvgPercentageFull12MonthsById,
     fetchAvgPercentageFull5YearsById,
     fetchAvgPercentageFull20YearsById,
+    fetchLatestDataById,
 } from '../../services/api';
 import DamContent from '../../components/DamContent/DamContent';
 import GoogleMapComponent from '../../components/GoogleMapComponent/GoogleMapComponent';
@@ -33,7 +33,10 @@ interface DamResource {
 const SelectedDamPage: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const [damData, setDamData] = useState<Dam | null>(location.state?.damData || null);
+
+    // Refactored damData to a simple variable since setDamData is unused
+    const damData: Dam | null = location.state?.damData || null;
+
     const [damResources, setDamResources] = useState<DamResource[]>([]);
     const [avgData, setAvgData] = useState<{ [key: string]: number | null }>({
         avg12Months: null,
@@ -47,21 +50,22 @@ const SelectedDamPage: React.FC = () => {
         if (damData) {
             const fetchData = async () => {
                 try {
-                    const [resources, avg12, avg5, avg20] = await Promise.all([
-                        fetchDamResources(damData.dam_id).then(data =>
-                            data.map(resource => ({
-                                ...resource,
-                                percentage_full: resource.percentage_full ?? 0, // Ensure percentage_full is a number
-                                storage_volume: resource.storage_volume ?? 0,
-                                storage_inflow: resource.storage_inflow ?? 0,
-                                storage_release: resource.storage_release ?? 0,
-                            }))
-                        ),
+                    const [latestData, avg12, avg5, avg20] = await Promise.all([
+                        fetchLatestDataById(damData.dam_id),
                         fetchAvgPercentageFull12MonthsById(damData.dam_id),
                         fetchAvgPercentageFull5YearsById(damData.dam_id),
                         fetchAvgPercentageFull20YearsById(damData.dam_id),
                     ]);
-                    setDamResources(resources);
+
+                    // Assuming latestData is a single entry. If it's an array, adjust accordingly.
+                    setDamResources([{
+                        date: latestData.date,
+                        percentage_full: latestData.percentage_full ?? 0,
+                        storage_volume: latestData.storage_volume ?? 0,
+                        storage_inflow: latestData.storage_inflow ?? 0,
+                        storage_release: latestData.storage_release ?? 0,
+                    }]);
+
                     setAvgData({ avg12Months: avg12, avg5Years: avg5, avg20Years: avg20 });
                     setLoading(false);
                 } catch (error) {

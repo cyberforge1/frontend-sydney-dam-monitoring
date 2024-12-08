@@ -36,10 +36,42 @@ const NetInflowReleaseGraph: React.FC<NetInflowReleaseGraphProps> = ({ data, dam
         ]
     };
 
+    const options = {
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: 'Date',
+                    font: { size: 18 }
+                },
+                ticks: { font: { size: 14 } }
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: 'Net Inflow/Release (ML)',
+                    font: { size: 18 }
+                },
+                ticks: { font: { size: 14 } }
+            }
+        },
+        plugins: {
+            title: {
+                display: true,
+                text: `${damName} Net Inflow and Release Over 12 Months`,
+                font: { size: 24 }
+            },
+            legend: {
+                labels: { font: { size: 14 } }
+            }
+        },
+        responsive: true,
+        maintainAspectRatio: false
+    };
+
     return (
         <div style={{ textAlign: 'center' }}>
-            <h2>{damName} Net Inflow and Release Over 12 Months</h2>
-            <Line data={chartData} options={{ maintainAspectRatio: false }} />
+            <Line data={chartData} options={options} />
         </div>
     );
 };

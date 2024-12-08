@@ -51,7 +51,7 @@ const SearchForDam: React.FC = () => {
 
     const handleSuggestionClick = async (dam: Dam) => {
         try {
-            // Assuming you want to navigate to a detailed view of the dam
+            // Fetch detailed dam data
             const damDetails = await fetchDamById(dam.dam_id);
             navigate('/dam', { state: { damData: damDetails } });
         } catch (error) {

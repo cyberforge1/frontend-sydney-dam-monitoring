@@ -5,14 +5,21 @@ import TopDamsPieCharts from '../../containers/TopDamsPieCharts/TopDamsPieCharts
 import DamGroupSelector from '../../components/DamGroupSelector/DamGroupSelector';
 import SearchForDam from '../../components/SearchForDam/SearchForDam';
 import OpenListOfDams from '../../components/OpenListOfDams/OpenListOfDams';
-import { fetchDamsByGroupName, fetchLatestDataById } from '../../services/api'; // Use the updated API functions
+import { fetchDamsByGroupName, fetchLatestDataById } from '../../services/api'; // Ensure these functions are correctly implemented
 import './HomePage.scss';
+
+interface DamData {
+    dam_id: string;
+    dam_name: string;
+    percentage_full: number;
+}
 
 const HomePage: React.FC = () => {
     // State to manage the selected group
     const [selectedGroup, setSelectedGroup] = useState<string>('sydney_dams');
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [damData, setDamData] = useState<DamData[]>([]); // State to store fetched dam data
 
     // Effect to fetch dam data whenever the selected group changes
     useEffect(() => {
@@ -21,6 +28,7 @@ const HomePage: React.FC = () => {
             setError(null);
             try {
                 const dams = await fetchDamsByGroupName(selectedGroup); // Fetch dams using the updated API
+
                 // For each dam, fetch latest data
                 const damDataPromises = dams.map(async (dam) => {
                     try {
@@ -41,7 +49,7 @@ const HomePage: React.FC = () => {
                 });
 
                 const combinedDamData = await Promise.all(damDataPromises);
-                // damData is fetched but not used. If you don't need it, you can remove the state and related code.
+                setDamData(combinedDamData); // Utilize damData by setting it here
                 setLoading(false);
             } catch (err) {
                 console.error('Error fetching dams by group:', err);
@@ -74,7 +82,8 @@ const HomePage: React.FC = () => {
                 ) : error ? (
                     <div className="error">{error}</div>
                 ) : (
-                    <TopDamsPieCharts /> {/* Removed damData prop */}
+                    /* Pass damData as a prop */
+                    <TopDamsPieCharts damData={damData} />
                 )}
             </div>
         </div>
