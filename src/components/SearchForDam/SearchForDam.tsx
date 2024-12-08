@@ -5,14 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { fetchAllDamsThunk, fetchDamByIdThunk } from '../../features/dams/damsSlice';
 import { useNavigate } from 'react-router-dom';
 import './SearchForDam.scss';
-
-interface Dam {
-  dam_id: string;
-  dam_name: string;
-  full_volume?: number;
-  latitude?: number;
-  longitude?: number;
-}
+import { Dam } from '../../types/types';
 
 const SearchForDam: React.FC = () => {
   const dispatch = useAppDispatch();

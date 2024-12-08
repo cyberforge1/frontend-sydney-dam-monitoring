@@ -37,13 +37,11 @@ const DamGroupSelector: React.FC<DamGroupSelectorProps> = ({ onSelectGroup }) =>
     onSelectGroup(nextGroup);
   };
 
-  const getLabel = (groupName: string): string => {
-    // Convert snake_case to Title Case for display
-    return groupName
+  const getLabel = (groupName: string): string =>
+    groupName
       .split('_')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
-  };
 
   if (status === 'loading') {
     return <div className="dam-group-selector">Loading groups...</div>;

@@ -7,7 +7,7 @@ import SelectedDamPage from './pages/SelectedDamPage/SelectedDamPage';
 import DamListPage from './pages/DamListPage/DamListPage';
 import PageTwo from './pages/PageTwo/PageTwo';
 import PageThree from './pages/PageThree/PageThree';
-import PageFour from './pages/PageFour/PageFour';
+// import PageFour from './pages/PageFour/PageFour';
 import PageFive from './pages/PageFive/PageFive';
 import Footer from './components/Footer/Footer';
 import './App.scss';
@@ -22,7 +22,7 @@ const App: React.FC = () => {
                             <HomePage />
                             <PageTwo />
                             <PageThree />
-                            <PageFour />
+                            {/* <PageFour /> */}
                             <PageFive />
                             <Footer />
                         </div>

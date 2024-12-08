@@ -1,105 +1,73 @@
 // src/api/api.ts
 
-import { Dam, DamGroup, DamGroupMember, DamResource, DamAnalysis } from '../types/types';
+import {
+  Dam,
+  DamGroup,
+  DamGroupMember,
+  DamResource,
+  DamAnalysis,
+  OverallDamAnalysis,
+} from '../types/types';
+
+// Base API URL (useful if environment-specific or configurable)
+const API_BASE_URL = '/api';
+
+// Utility function to fetch data
+const fetchData = async <T>(url: string): Promise<T> => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Error fetching ${url}: ${response.status} ${response.statusText} - ${errorText}`);
+  }
+  return response.json();
+};
 
 // Fetch all dams
 export const fetchAllDams = async (): Promise<Dam[]> => {
-  const response = await fetch('/api/dams');
-  if (!response.ok) {
-    throw new Error('Failed to fetch dams');
-  }
-  return response.json();
+  return fetchData<Dam[]>(`${API_BASE_URL}/dams`);
 };
 
 // Fetch dam by ID
 export const fetchDamById = async (damId: string): Promise<Dam> => {
-  const response = await fetch(`/api/dams/${damId}`);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch dam with ID: ${damId}`);
-  }
-  return response.json();
-};
-
-// Fetch all dam groups
-export const fetchAllDamGroups = async (): Promise<DamGroup[]> => {
-  const response = await fetch('/api/damGroups');
-  if (!response.ok) {
-    throw new Error('Failed to fetch dam groups');
-  }
-  return response.json();
-};
-
-// Fetch dams by group name
-export const fetchDamsByGroupName = async (groupName: string): Promise<Dam[]> => {
-  const response = await fetch(`/api/damGroups/${groupName}/dams`);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch dams for group: ${groupName}`);
-  }
-  return response.json();
-};
-
-// Fetch dam group members by group name
-export const fetchDamGroupMembersByGroupName = async (groupName: string): Promise<DamGroupMember[]> => {
-  const response = await fetch(`/api/damGroups/${groupName}/members`);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch members for group: ${groupName}`);
-  }
-  return response.json();
-};
-
-// Fetch latest data by dam ID
-export const fetchLatestDataById = async (damId: string): Promise<DamResource> => {
-  const response = await fetch(`/api/dams/${damId}/latestData`);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch latest data for dam ID: ${damId}`);
-  }
-  return response.json();
+  return fetchData<Dam>(`${API_BASE_URL}/dams/${damId}`);
 };
 
 // Fetch all latest dam data
 export const fetchAllLatestData = async (): Promise<DamResource[]> => {
-  const response = await fetch('/api/damResources/latestData');
-  if (!response.ok) {
-    throw new Error('Failed to fetch all latest dam data');
-  }
-  return response.json();
+  return fetchData<DamResource[]>(`${API_BASE_URL}/latest_data`);
+};
+
+// Fetch latest data by dam ID
+export const fetchLatestDataById = async (damId: string): Promise<DamResource> => {
+  return fetchData<DamResource>(`${API_BASE_URL}/latest_data/${damId}`);
 };
 
 // Fetch specific dam analysis by dam ID
 export const fetchSpecificDamAnalysisById = async (damId: string): Promise<DamAnalysis[]> => {
-  const response = await fetch(`/api/dams/${damId}/analysis`);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch analysis for dam ID: ${damId}`);
-  }
-  return response.json();
+  return fetchData<DamAnalysis[]>(`${API_BASE_URL}/specific_dam_analysis/${damId}`);
 };
 
-// Fetch average percentage full for 12 months
-export const fetchAvgPercentageFull12Months = async (): Promise<number> => {
-  const response = await fetch('/api/damResources/avgPercentageFull/12Months');
-  if (!response.ok) {
-    throw new Error('Failed to fetch 12-month average percentage full');
-  }
-  const data = await response.json();
-  return data.average;
+// Fetch all dam groups
+export const fetchAllDamGroups = async (): Promise<DamGroup[]> => {
+  return fetchData<DamGroup[]>(`${API_BASE_URL}/dam_groups`);
 };
 
-// Fetch average percentage full for 5 years
-export const fetchAvgPercentageFull5Years = async (): Promise<number> => {
-  const response = await fetch('/api/damResources/avgPercentageFull/5Years');
-  if (!response.ok) {
-    throw new Error('Failed to fetch 5-year average percentage full');
-  }
-  const data = await response.json();
-  return data.average;
+// Fetch dam group by name
+export const fetchDamGroupByName = async (groupName: string): Promise<DamGroup> => {
+  return fetchData<DamGroup>(`${API_BASE_URL}/dam_groups/${groupName}`);
 };
 
-// Fetch average percentage full for 20 years
-export const fetchAvgPercentageFull20Years = async (): Promise<number> => {
-  const response = await fetch('/api/damResources/avgPercentageFull/20Years');
-  if (!response.ok) {
-    throw new Error('Failed to fetch 20-year average percentage full');
-  }
-  const data = await response.json();
-  return data.average;
+// Fetch dam group members by group name
+export const fetchDamGroupMembersByGroupName = async (groupName: string): Promise<DamGroupMember[]> => {
+  return fetchData<DamGroupMember[]>(`${API_BASE_URL}/dam_group_members/${groupName}`);
+};
+
+// Fetch all overall dam analyses
+export const fetchAllOverallDamAnalyses = async (): Promise<OverallDamAnalysis[]> => {
+  return fetchData<OverallDamAnalysis[]>(`${API_BASE_URL}/overall_dam_analysis`);
+};
+
+// Fetch overall dam analysis by date
+export const fetchOverallDamAnalysisByDate = async (analysisDate: string): Promise<OverallDamAnalysis> => {
+  return fetchData<OverallDamAnalysis>(`${API_BASE_URL}/overall_dam_analysis/${analysisDate}`);
 };

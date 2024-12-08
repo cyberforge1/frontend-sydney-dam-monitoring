@@ -63,12 +63,10 @@ const SelectedDamPage: React.FC = () => {
 
   const { dam_name: damName, latitude = 0, longitude = 0 } = selectedDam;
 
-  // Find the latest dam resource data by dam_id and latest date
   const latestDamResource = latestData
     .filter((data) => data.dam_id === damId)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
 
-  // Aggregate average data from specificDamAnalyses
   const avgData = specificDamAnalyses.reduce(
     (acc, curr) => {
       acc.avg12Months = curr.avg_percentage_full_12_months ?? acc.avg12Months;

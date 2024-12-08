@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { fetchDamsByGroupNameThunk } from '../../features/damGroups/damGroupsSlice';
+import { fetchDamGroupMembersByGroupNameThunk } from '../../features/damGroups/damGroupsSlice';
 import DamStorageGraph from '../../graphs/DamStorageGraph/DamStorageGraph';
 import DamGroupSelector from '../../components/DamGroupSelector/DamGroupSelector';
 import './PageTwo.scss';
@@ -15,20 +15,21 @@ interface GraphDam {
 
 const PageTwo: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { groupDams, status, error } = useAppSelector((state) => state.damGroups);
+  const { groupMembers, status, error } = useAppSelector((state) => state.damGroups);
   const [selectedGroup, setSelectedGroup] = React.useState<string>('sydney_dams');
 
   useEffect(() => {
-    dispatch(fetchDamsByGroupNameThunk(selectedGroup));
+    if (selectedGroup) {
+      dispatch(fetchDamGroupMembersByGroupNameThunk(selectedGroup));
+    }
   }, [selectedGroup, dispatch]);
 
-  // Transform data for DamStorageGraph
-  const transformedData: GraphDam[] = groupDams
-    .filter(dam => dam.full_volume !== undefined)
-    .map(dam => ({
-      dam_id: dam.dam_id,
-      dam_name: dam.dam_name,
-      storage_volume: dam.full_volume as number,
+  // Transform groupMembers into data for DamStorageGraph
+  const transformedData: GraphDam[] = groupMembers
+    .map((member) => ({
+      dam_id: member.dam_id,
+      dam_name: member.group_name, // Assuming group_name corresponds to dam_name
+      storage_volume: 0, // Placeholder since storage_volume is not part of groupMembers
     }));
 
   return (

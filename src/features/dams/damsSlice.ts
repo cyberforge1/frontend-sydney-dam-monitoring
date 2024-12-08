@@ -4,7 +4,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { fetchAllDams, fetchDamById } from '../../api/api';
 import { Dam } from '../../types/types';
 
-// **Export the DamsState interface**
+// Define the state interface
 export interface DamsState {
   dams: Dam[];
   selectedDam: Dam | null;
@@ -19,7 +19,7 @@ const initialState: DamsState = {
   error: null,
 };
 
-// Async thunk to fetch all dams
+// Thunk to fetch all dams
 export const fetchAllDamsThunk = createAsyncThunk<Dam[], void>(
   'dams/fetchAllDams',
   async () => {
@@ -28,7 +28,7 @@ export const fetchAllDamsThunk = createAsyncThunk<Dam[], void>(
   }
 );
 
-// Async thunk to fetch dam by ID
+// Thunk to fetch dam by ID
 export const fetchDamByIdThunk = createAsyncThunk<Dam, string>(
   'dams/fetchDamById',
   async (damId: string) => {
@@ -47,7 +47,6 @@ const damsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Handle fetchAllDamsThunk
       .addCase(fetchAllDamsThunk.pending, (state) => {
         state.status = 'loading';
       })
@@ -59,7 +58,6 @@ const damsSlice = createSlice({
         state.status = 'failed';
         state.error = action.error.message || 'Failed to fetch dams';
       })
-      // Handle fetchDamByIdThunk
       .addCase(fetchDamByIdThunk.pending, (state) => {
         state.status = 'loading';
       })
