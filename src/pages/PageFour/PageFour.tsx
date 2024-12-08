@@ -1,56 +1,43 @@
-// // src/pages/PageFour/PageFour.tsx
+// src/pages/PageFour/PageFour.tsx
 
-// import React, { useEffect } from 'react';
-// import { useAppDispatch, useAppSelector } from '../../app/hooks';
-// import {
-//   fetchAvgPercentageFull12MonthsThunk,
-//   fetchAvgPercentageFull5YearsThunk,
-//   fetchAvgPercentageFull20YearsThunk,
-// } from '../../features/damResources/damResourcesSlice';
-// import './PageFour.scss';
+import React, { useEffect, useState } from 'react';
+import FigureBox from '../../components/FigureBox/FigureBox';
+import { fetchAvgPercentageFull12Months, fetchAvgPercentageFull5Years, fetchAvgPercentageFull20Years } from '../../services/api';
+import './PageFour.scss';
 
-// const PageFour: React.FC = () => {
-//   const dispatch = useAppDispatch();
+const PageFour: React.FC = () => {
+    const [avg12Months, setAvg12Months] = useState<string | null>(null);
+    const [avg5Years, setAvg5Years] = useState<string | null>(null);
+    const [avg20Years, setAvg20Years] = useState<string | null>(null);
 
-//   const { avg12Months, avg5Years, avg20Years, status, error } = useAppSelector(
-//     (state) => state.damResources
-//   );
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data12Months = await fetchAvgPercentageFull12Months();
+                setAvg12Months(data12Months.toFixed(2) + '%');
 
-//   useEffect(() => {
-//     if (status === 'idle') {
-//       dispatch(fetchAvgPercentageFull12MonthsThunk());
-//       dispatch(fetchAvgPercentageFull5YearsThunk());
-//       dispatch(fetchAvgPercentageFull20YearsThunk());
-//     }
-//   }, [dispatch, status]);
+                const data5Years = await fetchAvgPercentageFull5Years();
+                setAvg5Years(data5Years.toFixed(2) + '%');
 
-//   if (status === 'loading') {
-//     return <div className="page-four">Loading average data...</div>;
-//   }
+                const data20Years = await fetchAvgPercentageFull20Years();
+                setAvg20Years(data20Years.toFixed(2) + '%');
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
 
-//   if (status === 'failed') {
-//     return <div className="page-four error">{error}</div>;
-//   }
+        fetchData();
+    }, []);
 
-//   return (
-//     <div className="page-four">
-//       <h1>Dam Averages</h1>
-//       <div className="averages-container">
-//         <div className="average-card">
-//           <h2>12 Months Average</h2>
-//           <p>{avg12Months !== null ? `${avg12Months.toFixed(2)}%` : 'N/A'}</p>
-//         </div>
-//         <div className="average-card">
-//           <h2>5 Years Average</h2>
-//           <p>{avg5Years !== null ? `${avg5Years.toFixed(2)}%` : 'N/A'}</p>
-//         </div>
-//         <div className="average-card">
-//           <h2>20 Years Average</h2>
-//           <p>{avg20Years !== null ? `${avg20Years.toFixed(2)}%` : 'N/A'}</p>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
+    return (
+        <div className="page-four">
+            <div className="figure-box-container">
+                <FigureBox title="All Dams Average Percentage Full (12 Months)" data={avg12Months} />
+                <FigureBox title="All Dams Average Percentage Full (5 Years)" data={avg5Years} />
+                <FigureBox title="All Dams Average Percentage Full (20 Years)" data={avg20Years} />
+            </div>
+        </div>
+    );
+};
 
-// export default PageFour;
+export default PageFour;

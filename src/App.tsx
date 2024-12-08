@@ -21,8 +21,8 @@ const App: React.FC = () => {
                 <Routes>
                     <Route path="/" element={
                         <div className="stacked-pages">
-                            <ApiConnectionPage />
                             <TestingPage />
+                            <ApiConnectionPage />
                             {/* <HomePage /> */}
                             {/* <PageTwo /> */}
                             {/* <PageThree /> */}

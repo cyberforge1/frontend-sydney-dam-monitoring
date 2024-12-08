@@ -7,13 +7,8 @@ import './DamStorageGraph.scss';
 
 Chart.register(...registerables);
 
-interface Dam {
-    dam_name: string;
-    storage_volume: number;
-}
-
 interface DamStorageGraphProps {
-    data: Dam[];
+    data: any[];
 }
 
 const DamStorageGraph: React.FC<DamStorageGraphProps> = ({ data }) => {
@@ -36,17 +31,54 @@ const DamStorageGraph: React.FC<DamStorageGraphProps> = ({ data }) => {
     const options = {
         scales: {
             x: {
-                title: { display: true, text: 'Dam Name', font: { size: 18 } },
-                ticks: { font: { size: 14 } }
+                title: {
+                    display: true,
+                    text: 'Dam Name',
+                    font: {
+                        size: 18
+                    }
+                },
+                ticks: {
+                    maxRotation: 45,
+                    minRotation: 45,
+                    font: {
+                        size: 14
+                    }
+                }
             },
             y: {
-                title: { display: true, text: 'Storage Volume (ML)', font: { size: 18 } },
-                ticks: { font: { size: 14 }, beginAtZero: true }
+                title: {
+                    display: true,
+                    text: 'Storage Volume (ML)',
+                    font: {
+                        size: 18
+                    }
+                },
+                ticks: {
+                    beginAtZero: true,
+                    font: {
+                        size: 14
+                    }
+                }
             }
         },
         plugins: {
-            title: { display: true, text: 'Dam Storage Capacity', font: { size: 24 } },
-            legend: { labels: { font: { size: 14 } } }
+            title: {
+                display: true,
+                text: 'Dam Storage Capacity',
+                font: {
+                    size: 24
+                }
+            },
+            legend: {
+                display: true,
+                position: 'top' as 'top',
+                labels: {
+                    font: {
+                        size: 14
+                    }
+                }
+            }
         },
         responsive: true,
         maintainAspectRatio: false
