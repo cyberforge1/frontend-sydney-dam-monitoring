@@ -1,15 +1,15 @@
-// src/graphs/DamCapacityPercentageGraph/DamCapacityPercentageGraph.tsx
+// # src/graphs/DamCapacityPercentageGraph/DamCapacityPercentageGraph.tsx
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart, registerables } from 'chart.js';
+import { useSelector, useDispatch } from 'react-redux';
+import { AppDispatch, RootState } from '../../store/store';
+import { fetchAllLatestDataThunk } from '../../features/damResources/damResourcesSlice';
+import { fetchAllDamsThunk } from '../../features/dams/damsSlice';
 import './DamCapacityPercentageGraph.scss';
 
 Chart.register(...registerables);
-
-interface DamCapacityPercentageGraphProps {
-    data: any[];
-}
 
 const getColor = (index: number) => {
     const colors = [
@@ -27,32 +27,57 @@ const getColor = (index: number) => {
     return colors[index % colors.length];
 };
 
-const DamCapacityPercentageGraph: React.FC<DamCapacityPercentageGraphProps> = ({ data }) => {
-    const labels = Array.from(new Set(data.map(d => d.date))).sort();
-    const dams = Array.from(new Set(data.map(d => d.dam_id)));
-    const damNamesMap = data.reduce((acc, curr) => {
-        acc[curr.dam_id] = curr.dam_name;
+const DamCapacityPercentageGraph: React.FC = () => {
+    const dispatch = useDispatch<AppDispatch>();
+    const { latestData, status: resourcesStatus, error: resourcesError } = useSelector((state: RootState) => state.damResources);
+    const { dams, status: damsStatus, error: damsError } = useSelector((state: RootState) => state.dams);
+
+    useEffect(() => {
+        if (resourcesStatus === 'idle') {
+            dispatch(fetchAllLatestDataThunk());
+        }
+        if (damsStatus === 'idle') {
+            dispatch(fetchAllDamsThunk());
+        }
+    }, [dispatch, resourcesStatus, damsStatus]);
+
+    if (resourcesStatus === 'loading' || damsStatus === 'loading') {
+        return <div>Loading dam capacity percentage data...</div>;
+    }
+
+    if (resourcesError || damsError) {
+        return <div>Error: {resourcesError || damsError}</div>;
+    }
+
+    const labels = Array.from(new Set(latestData.map((d) => d.date))).sort();
+    const damsMap = dams.reduce((acc, dam) => {
+        acc[dam.dam_id] = dam.dam_name;
         return acc;
     }, {} as Record<string, string>);
 
-    const datasets = dams.map((dam_id, index) => {
-        const damData = data.filter(d => d.dam_id === dam_id);
-        return {
-            label: damNamesMap[dam_id],
-            data: labels.map(label => {
-                const entry = damData.find(d => d.date === label);
-                return entry ? entry.percentage_full : null;
-            }),
-            fill: false,
-            borderColor: getColor(index),
-            backgroundColor: getColor(index),
-            tension: 0.1
-        };
-    });
+    const datasets = latestData.reduce((acc, entry) => {
+        const damName = damsMap[entry.dam_id] || `Dam ${entry.dam_id}`;
+        const dataset = acc.find((ds) => ds.label === damName);
+
+        if (!dataset) {
+            acc.push({
+                label: damName,
+                data: [],
+                fill: false,
+                borderColor: getColor(acc.length),
+                backgroundColor: getColor(acc.length),
+                tension: 0.1,
+            });
+        }
+
+        acc.find((ds) => ds.label === damName)?.data.push(entry.percentage_full);
+
+        return acc;
+    }, [] as { label: string; data: (number | null)[]; fill: boolean; borderColor: string; backgroundColor: string; tension: number }[]);
 
     const chartData = {
         labels,
-        datasets
+        datasets,
     };
 
     const options = {
@@ -61,54 +86,42 @@ const DamCapacityPercentageGraph: React.FC<DamCapacityPercentageGraphProps> = ({
                 title: {
                     display: true,
                     text: 'Date',
-                    font: {
-                        size: 18
-                    }
+                    font: { size: 18 },
                 },
                 ticks: {
                     maxRotation: 45,
                     minRotation: 45,
-                    font: {
-                        size: 14
-                    }
-                }
+                    font: { size: 14 },
+                },
             },
             y: {
                 title: {
                     display: true,
                     text: 'Percentage Full',
-                    font: {
-                        size: 18
-                    }
+                    font: { size: 18 },
                 },
                 ticks: {
                     beginAtZero: true,
-                    font: {
-                        size: 14
-                    }
-                }
-            }
+                    font: { size: 14 },
+                },
+            },
         },
         plugins: {
             title: {
                 display: true,
                 text: 'Dam Capacity Percentage Over Last 12 Months',
-                font: {
-                    size: 24
-                }
+                font: { size: 24 },
             },
             legend: {
                 display: true,
-                position: 'top' as 'top',
+                position: 'top' as const,
                 labels: {
-                    font: {
-                        size: 14
-                    }
-                }
-            }
+                    font: { size: 14 },
+                },
+            },
         },
         responsive: true,
-        maintainAspectRatio: false
+        maintainAspectRatio: false,
     };
 
     return (

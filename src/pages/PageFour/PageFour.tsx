@@ -1,33 +1,37 @@
-// src/pages/PageFour/PageFour.tsx
+// # src/pages/PageFour/PageFour.tsx
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { AppDispatch, RootState } from '../../store/store';
+import { fetchAllOverallDamAnalysesThunk } from '../../features/damResources/damResourcesSlice';
 import FigureBox from '../../components/FigureBox/FigureBox';
-import { fetchAvgPercentageFull12Months, fetchAvgPercentageFull5Years, fetchAvgPercentageFull20Years } from '../../services/api';
 import './PageFour.scss';
 
 const PageFour: React.FC = () => {
-    const [avg12Months, setAvg12Months] = useState<string | null>(null);
-    const [avg5Years, setAvg5Years] = useState<string | null>(null);
-    const [avg20Years, setAvg20Years] = useState<string | null>(null);
+    const dispatch = useDispatch<AppDispatch>();
+    const { latestData, status, error } = useSelector((state: RootState) => state.damResources);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data12Months = await fetchAvgPercentageFull12Months();
-                setAvg12Months(data12Months.toFixed(2) + '%');
+        if (status === 'idle') {
+            dispatch(fetchAllOverallDamAnalysesThunk());
+        }
+    }, [dispatch, status]);
 
-                const data5Years = await fetchAvgPercentageFull5Years();
-                setAvg5Years(data5Years.toFixed(2) + '%');
+    if (status === 'loading') {
+        return <div>Loading data...</div>;
+    }
 
-                const data20Years = await fetchAvgPercentageFull20Years();
-                setAvg20Years(data20Years.toFixed(2) + '%');
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
 
-        fetchData();
-    }, []);
+    if (latestData.length === 0) {
+        return <div>No data available.</div>;
+    }
+
+    const avg12Months = latestData[0]?.avg_percentage_full_12_months?.toFixed(2) + '%' || null;
+    const avg5Years = latestData[0]?.avg_percentage_full_5_years?.toFixed(2) + '%' || null;
+    const avg20Years = latestData[0]?.avg_percentage_full_20_years?.toFixed(2) + '%' || null;
 
     return (
         <div className="page-four">

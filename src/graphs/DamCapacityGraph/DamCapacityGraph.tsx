@@ -1,19 +1,40 @@
-// src/graphs/DamCapacityGraph/DamCapacityGraph.tsx
+// # src/graphs/DamCapacityGraph/DamCapacityGraph.tsx
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart, registerables } from 'chart.js';
+import { useSelector, useDispatch } from 'react-redux';
+import { AppDispatch, RootState } from '../../store/store';
+import { fetchSpecificDamAnalysisByIdThunk } from '../../features/damResources/damResourcesSlice';
 
 Chart.register(...registerables);
 
 interface DamCapacityGraphProps {
-    data: any[];
-    damName: string;
+    damId: string;
 }
 
-const DamCapacityGraph: React.FC<DamCapacityGraphProps> = ({ data, damName }) => {
-    const labels = data.map(d => d.date);
-    const percentages = data.map(d => d.percentage_full);
+const DamCapacityGraph: React.FC<DamCapacityGraphProps> = ({ damId }) => {
+    const dispatch = useDispatch<AppDispatch>();
+    const { specificDamAnalyses, status, error } = useSelector((state: RootState) => state.damResources);
+    const { selectedDam } = useSelector((state: RootState) => state.dams);
+
+    useEffect(() => {
+        dispatch(fetchSpecificDamAnalysisByIdThunk(damId));
+    }, [dispatch, damId]);
+
+    if (status === 'loading') {
+        return <div>Loading graph data...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
+
+    const damData = specificDamAnalyses;
+    const damName = selectedDam?.dam_name || 'Dam';
+
+    const labels = damData.map((d) => d.analysis_date);
+    const percentages = damData.map((d) => d.avg_percentage_full_12_months || 0);
 
     const chartData = {
         labels,
@@ -23,9 +44,9 @@ const DamCapacityGraph: React.FC<DamCapacityGraphProps> = ({ data, damName }) =>
                 data: percentages,
                 fill: false,
                 borderColor: 'rgb(75, 192, 192)',
-                tension: 0.1
-            }
-        ]
+                tension: 0.1,
+            },
+        ],
     };
 
     return (

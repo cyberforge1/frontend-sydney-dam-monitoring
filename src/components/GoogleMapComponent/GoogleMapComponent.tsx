@@ -1,4 +1,4 @@
-// src/components/GoogleMapComponent/GoogleMapComponent.tsx
+// # src/components/GoogleMapComponent/GoogleMapComponent.tsx
 
 import React, { useEffect, useRef } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
@@ -22,23 +22,26 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({ lat, lng }) => 
             version: 'weekly',
         });
 
-        loader.load().then(() => {
-            if (mapRef.current && !isNaN(lat) && !isNaN(lng)) {
-                const map = new google.maps.Map(mapRef.current, {
-                    center: { lat, lng },
-                    zoom: 10,
-                });
+        loader
+            .load()
+            .then(() => {
+                if (mapRef.current && !isNaN(lat) && !isNaN(lng)) {
+                    const map = new google.maps.Map(mapRef.current, {
+                        center: { lat, lng },
+                        zoom: 10,
+                    });
 
-                new google.maps.Marker({
-                    position: { lat, lng },
-                    map,
-                });
-            } else {
-                console.error('Invalid coordinates:', { lat, lng });
-            }
-        }).catch(err => {
-            console.error('Error loading Google Maps API:', err);
-        });
+                    new google.maps.Marker({
+                        position: { lat, lng },
+                        map,
+                    });
+                } else {
+                    console.error('Invalid coordinates:', { lat, lng });
+                }
+            })
+            .catch((err) => {
+                console.error('Error loading Google Maps API:', err);
+            });
     }, [lat, lng]);
 
     return <div ref={mapRef} style={containerStyle}></div>;

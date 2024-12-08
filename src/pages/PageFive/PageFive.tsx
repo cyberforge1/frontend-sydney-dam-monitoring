@@ -1,5 +1,6 @@
-// src/pages/PageFour/PageFour.tsx
+// # src/pages/PageFive/PageFive.tsx
 
+import React from 'react';
 import TextBox from '../../components/TextBox/TextBox';
 import './PageFive.scss';
 
@@ -8,6 +9,7 @@ const PageFive: React.FC = () => {
         <div className="page-five">
             <div className="content">
                 <h1 className="header-fixed-height">Project Details</h1>
+                {/* Rendering the TextBox component */}
                 <TextBox />
             </div>
         </div>

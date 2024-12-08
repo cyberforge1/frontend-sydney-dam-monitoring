@@ -1,25 +1,31 @@
-// src/pages/HomePage/HomePage.tsx
+// # src/pages/HomePage/HomePage.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../store/store';
+import { fetchDamGroupMembersByGroupNameThunk } from '../../features/damGroups/damGroupsSlice';
 import TopDamsPieCharts from '../../containers/TopDamsPieCharts/TopDamsPieCharts';
 import DamGroupSelector from '../../components/DamGroupSelector/DamGroupSelector';
 import SearchForDam from '../../components/SearchForDam/SearchForDam';
 import OpenListOfDams from '../../components/OpenListOfDams/OpenListOfDams';
-import { fetchDamsDataByGroup } from '../../services/api';
 import './HomePage.scss';
 
 const HomePage: React.FC = () => {
-    const [selectedGroup, setSelectedGroup] = useState<string>('sydney_dams');
-    const [damData, setDamData] = useState<any[]>([]);
+    const dispatch = useDispatch<AppDispatch>();
+    const { groupMembers, status, error } = useSelector((state: RootState) => state.damGroups);
+    const [selectedGroup, setSelectedGroup] = React.useState<string>('sydney_dams');
 
     useEffect(() => {
-        const fetchDamData = async () => {
-            const data = await fetchDamsDataByGroup(selectedGroup);
-            setDamData(data);
-        };
+        dispatch(fetchDamGroupMembersByGroupNameThunk(selectedGroup));
+    }, [dispatch, selectedGroup]);
 
-        fetchDamData();
-    }, [selectedGroup]);
+    if (status === 'loading') {
+        return <div>Loading data for {selectedGroup}...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
 
     return (
         <div className="homepage">
@@ -33,7 +39,7 @@ const HomePage: React.FC = () => {
                 <DamGroupSelector onSelectGroup={setSelectedGroup} />
             </div>
             <div className="top-dams-pie-charts-container">
-                <TopDamsPieCharts damData={damData} />
+                <TopDamsPieCharts damData={groupMembers} />
             </div>
         </div>
     );

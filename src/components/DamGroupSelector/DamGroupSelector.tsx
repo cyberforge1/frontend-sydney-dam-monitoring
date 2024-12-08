@@ -1,34 +1,51 @@
-// src/components/DamGroupSelector/DamGroupSelector.tsx
+// # src/components/DamGroupSelector/DamGroupSelector.tsx
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../store/store';
+import { fetchAllDamGroupsThunk } from '../../features/damGroups/damGroupsSlice';
 import './DamGroupSelector.scss';
 
 interface DamGroupSelectorProps {
     onSelectGroup: (group: string) => void;
 }
 
-const groups = [
-    { value: 'sydney_dams', label: 'Sydney Dams' },
-    { value: 'popular_dams', label: 'Popular Dams' },
-    { value: 'large_dams', label: 'Large Dams' },
-    { value: 'small_dams', label: 'Small Dams' },
-    { value: 'greatest_released', label: 'Highest flow' },
-];
-
 const DamGroupSelector: React.FC<DamGroupSelectorProps> = ({ onSelectGroup }) => {
-    const [currentGroup, setCurrentGroup] = useState(groups[0]);
+    const dispatch = useDispatch<AppDispatch>();
+    const { groups, status, error } = useSelector((state: RootState) => state.damGroups);
+    const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
+
+    useEffect(() => {
+        if (status === 'idle') {
+            dispatch(fetchAllDamGroupsThunk());
+        }
+    }, [dispatch, status]);
 
     const handleClick = () => {
-        const currentIndex = groups.findIndex(group => group.value === currentGroup.value);
-        const nextIndex = (currentIndex + 1) % groups.length;
-        const nextGroup = groups[nextIndex];
-        setCurrentGroup(nextGroup);
-        onSelectGroup(nextGroup.value);
+        if (groups.length === 0) return;
+
+        const nextIndex = (currentGroupIndex + 1) % groups.length;
+        setCurrentGroupIndex(nextIndex);
+        onSelectGroup(groups[nextIndex].group_name);
     };
+
+    if (status === 'loading') {
+        return <div className="dam-group-selector">Loading groups...</div>;
+    }
+
+    if (error) {
+        return <div className="dam-group-selector">Error loading groups: {error}</div>;
+    }
+
+    if (groups.length === 0) {
+        return <div className="dam-group-selector">No dam groups available</div>;
+    }
 
     return (
         <div className="dam-group-selector">
-            <button onClick={handleClick}>{currentGroup.label}</button>
+            <button onClick={handleClick}>
+                {groups[currentGroupIndex]?.group_name || 'Select a Group'}
+            </button>
         </div>
     );
 };

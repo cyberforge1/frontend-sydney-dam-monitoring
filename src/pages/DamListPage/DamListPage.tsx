@@ -1,44 +1,52 @@
-// src/pages/DamListPage/DamListPage.tsx
+// # src/pages/DamListPage/DamListPage.tsx
 
-import React, { useEffect, useState } from 'react';
-import { fetchDamNames } from '../../services/api';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { AppDispatch, RootState } from '../../store/store';
+import { fetchAllDamsThunk } from '../../features/dams/damsSlice';
 import './DamListPage.scss';
 
 const DamListPage: React.FC = () => {
-    const [damNames, setDamNames] = useState<string[]>([]);
+    const dispatch = useDispatch<AppDispatch>();
+    const { dams, status, error } = useSelector((state: RootState) => state.dams);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const loadDamNames = async () => {
-            try {
-                const names = await fetchDamNames();
-                setDamNames(names);
-            } catch (error) {
-                console.error('Error fetching dam names:', error);
-            }
-        };
+        if (status === 'idle') {
+            dispatch(fetchAllDamsThunk());
+        }
+    }, [dispatch, status]);
 
-        loadDamNames();
-    }, []);
-
-    const handleDamClick = async (damName: string) => {
-        navigate('/dam', { state: { damName } });
+    const handleDamClick = (damId: string) => {
+        navigate('/dam', { state: { damId } });
     };
 
     const handleBackClick = () => {
         navigate('/');
     };
 
-    const splitDamNames = () => {
-        const third = Math.ceil(damNames.length / 3);
-        const firstSection = damNames.slice(0, third);
-        const secondSection = damNames.slice(third, third * 2);
-        const thirdSection = damNames.slice(third * 2, damNames.length);
+    const splitDamList = () => {
+        const third = Math.ceil(dams.length / 3);
+        const firstSection = dams.slice(0, third);
+        const secondSection = dams.slice(third, third * 2);
+        const thirdSection = dams.slice(third * 2, dams.length);
         return [firstSection, secondSection, thirdSection];
     };
 
-    const [firstSection, secondSection, thirdSection] = splitDamNames();
+    const [firstSection, secondSection, thirdSection] = splitDamList();
+
+    if (status === 'loading') {
+        return <div>Loading list of dams...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
+
+    if (dams.length === 0) {
+        return <div>No dams available.</div>;
+    }
 
     return (
         <div className="dam-list-page">
@@ -46,23 +54,23 @@ const DamListPage: React.FC = () => {
             <h1>List of Dams</h1>
             <div className="dam-list-sections">
                 <ul>
-                    {firstSection.map((dam, index) => (
-                        <li key={index} onClick={() => handleDamClick(dam)}>
-                            {dam}
+                    {firstSection.map((dam) => (
+                        <li key={dam.dam_id} onClick={() => handleDamClick(dam.dam_id)}>
+                            {dam.dam_name}
                         </li>
                     ))}
                 </ul>
                 <ul>
-                    {secondSection.map((dam, index) => (
-                        <li key={index} onClick={() => handleDamClick(dam)}>
-                            {dam}
+                    {secondSection.map((dam) => (
+                        <li key={dam.dam_id} onClick={() => handleDamClick(dam.dam_id)}>
+                            {dam.dam_name}
                         </li>
                     ))}
                 </ul>
                 <ul>
-                    {thirdSection.map((dam, index) => (
-                        <li key={index} onClick={() => handleDamClick(dam)}>
-                            {dam}
+                    {thirdSection.map((dam) => (
+                        <li key={dam.dam_id} onClick={() => handleDamClick(dam.dam_id)}>
+                            {dam.dam_name}
                         </li>
                     ))}
                 </ul>

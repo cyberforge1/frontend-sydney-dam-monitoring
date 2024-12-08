@@ -1,9 +1,5 @@
 # TO DO
 
-1) Comment out all existing code
+1) Update Google Maps component for successful calls
 
-2) Create a page to print out all data from the api
-
-3) Create a page to test functionality of added features and components
-
-4) Integrate new endpoints into existing features
+2) enhance the data flow structure

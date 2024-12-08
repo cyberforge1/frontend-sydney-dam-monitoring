@@ -1,42 +1,41 @@
-// src/components/SearchForDam/SearchForDam.tsx
+// # src/components/SearchForDam/SearchForDam.tsx
 
 import React, { useState, useEffect, useRef } from 'react';
-import { fetchDamNames, fetchDamDataByName } from '../../services/api';
+import { useSelector, useDispatch } from 'react-redux';
+import { AppDispatch, RootState } from '../../store/store';
+import { fetchAllDamsThunk } from '../../features/dams/damsSlice';
 import { useNavigate } from 'react-router-dom';
 import './SearchForDam.scss';
 
 const SearchForDam: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
-    const [damNames, setDamNames] = useState<string[]>([]);
     const [filteredDams, setFilteredDams] = useState<string[]>([]);
     const [activeSuggestionIndex, setActiveSuggestionIndex] = useState<number>(-1);
     const suggestionsRef = useRef<HTMLUListElement>(null);
+
     const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
+    const { dams, status, error } = useSelector((state: RootState) => state.dams);
 
     useEffect(() => {
-        const loadDamNames = async () => {
-            try {
-                const names = await fetchDamNames();
-                setDamNames(names);
-            } catch (error) {
-                console.error('Error fetching dam names:', error);
-            }
-        };
-
-        loadDamNames();
-    }, []);
+        if (status === 'idle') {
+            dispatch(fetchAllDamsThunk());
+        }
+    }, [dispatch, status]);
 
     useEffect(() => {
-        if (searchQuery) {
+        if (searchQuery && dams.length > 0) {
             setFilteredDams(
-                damNames.filter(dam =>
-                    dam.toLowerCase().includes(searchQuery.toLowerCase())
-                )
+                dams
+                    .map((dam) => dam.dam_name)
+                    .filter((name) =>
+                        name.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
             );
         } else {
             setFilteredDams([]);
         }
-    }, [searchQuery, damNames]);
+    }, [searchQuery, dams]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -79,26 +78,34 @@ const SearchForDam: React.FC = () => {
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement> | React.KeyboardEvent<HTMLInputElement>) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement> | React.KeyboardEvent<HTMLInputElement>) => {
         e.preventDefault();
         if (searchQuery) {
-            try {
-                const data = await fetchDamDataByName(searchQuery);
-                navigate('/dam', { state: { damData: data } });
-            } catch (error) {
-                console.error('Error fetching dam data:', error);
+            const selectedDam = dams.find((dam) => dam.dam_name.toLowerCase() === searchQuery.toLowerCase());
+            if (selectedDam) {
+                navigate('/dam', { state: { damData: selectedDam } });
+            } else {
+                console.error('No dam found with the given name:', searchQuery);
             }
         }
     };
 
-    const handleSuggestionClick = async (damName: string) => {
-        try {
-            const data = await fetchDamDataByName(damName);
-            navigate('/dam', { state: { damData: data } });
-        } catch (error) {
-            console.error('Error fetching dam data:', error);
+    const handleSuggestionClick = (damName: string) => {
+        const selectedDam = dams.find((dam) => dam.dam_name === damName);
+        if (selectedDam) {
+            navigate('/dam', { state: { damData: selectedDam } });
+        } else {
+            console.error('No dam found with the given name:', damName);
         }
     };
+
+    if (status === 'loading') {
+        return <div className="search-for-dam">Loading...</div>;
+    }
+
+    if (error) {
+        return <div className="search-for-dam">Error: {error}</div>;
+    }
 
     return (
         <div className="search-for-dam">
@@ -130,4 +137,3 @@ const SearchForDam: React.FC = () => {
 };
 
 export default SearchForDam;
-
