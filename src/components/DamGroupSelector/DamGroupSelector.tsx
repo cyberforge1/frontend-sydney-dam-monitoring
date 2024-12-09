@@ -1,6 +1,6 @@
-// # src/components/DamGroupSelector/DamGroupSelector.tsx
+// src/components/DamGroupSelector/DamGroupSelector.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store/store';
 import { fetchAllDamGroupsThunk } from '../../features/damGroups/damGroupsSlice';
@@ -17,9 +17,14 @@ const DamGroupSelector: React.FC<DamGroupSelectorProps> = ({ onSelectGroup }) =>
 
     useEffect(() => {
         if (status === 'idle') {
+            console.log('Fetching all dam groups...');
             dispatch(fetchAllDamGroupsThunk());
         }
     }, [dispatch, status]);
+
+    useEffect(() => {
+        console.log('Available groups:', groups);
+    }, [groups]);
 
     const handleClick = () => {
         if (groups.length === 0) return;
@@ -27,6 +32,7 @@ const DamGroupSelector: React.FC<DamGroupSelectorProps> = ({ onSelectGroup }) =>
         const nextIndex = (currentGroupIndex + 1) % groups.length;
         setCurrentGroupIndex(nextIndex);
         onSelectGroup(groups[nextIndex].group_name);
+        console.log('Selected group:', groups[nextIndex]?.group_name);
     };
 
     if (status === 'loading') {

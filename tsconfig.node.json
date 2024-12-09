@@ -1,13 +1,19 @@
+// tsconfig.node.json
+
 {
   "compilerOptions": {
     "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "skipLibCheck": true,
     "module": "ESNext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node", // Use "node" for compatibility with most environments
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "noEmit": true
+    "noEmit": true,
+    "baseUrl": "./", // Ensures paths are relative to the root
+    "paths": {
+      "@features/*": ["src/features/*"] // Alias for features
+    }
   },
-  "include": ["vite.config.ts"]
+  "include": ["vite.config.ts", "src/**/*"]
 }
