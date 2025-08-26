@@ -1,7 +1,7 @@
 // # src/pages/TestingPage/TestingPage.tsx
 
 import React from 'react';
-import HomePage from '../../pages/HomePage/HomePage';
+// import HomePage from '../../pages/HomePage/HomePage';
 // import DamListPage from '../../pages/DamListPage/DamListPage';
 // import DamStorageGraph from '../../graphs/DamStorageGraph/DamStorageGraph';
 // import NetInflowReleaseGraph from '../../graphs/NetInflowReleaseGraph/NetInflowReleaseGraph';
@@ -24,7 +24,7 @@ const TestingPage: React.FC = () => {
     return (
         <div className="testing-page">
             {/* Testing the new PageFour component */}
-            <HomePage />
+            {/* <HomePage /> */}
 
             {/* <PageFour /> */}
             {/* Commented out older components for isolated testing */}
