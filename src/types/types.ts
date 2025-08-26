@@ -18,7 +18,7 @@ export interface DamGroupMember {
 }
 
 export interface DamResource {
-  dam_id: string; // Associates resource with a dam
+  dam_id: string;
   date: string;
   percentage_full: number;
   storage_volume: number;
