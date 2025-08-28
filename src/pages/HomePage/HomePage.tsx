@@ -85,7 +85,7 @@ const HomePage: React.FC = () => {
   return (
     <div className="homepage">
       <div className="header">
-        <h1>Sydney Dam Monitoring</h1>
+        <h1>Water Dashboard NSW</h1>
         <p>Track live and historical data from dams across NSW, Australia</p>
       </div>
 
