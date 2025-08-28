@@ -1,7 +1,5 @@
 // src/__tests__/api/api.test.ts
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 type ApiModule = typeof import('../../api/api');
 
 const mockFetchOk = (payload: unknown) =>
@@ -28,11 +26,7 @@ const mockFetchError = (status: number, statusText = 'Error', body = 'Not Found'
     } as any)
   ) as jest.Mock);
 
-/**
- * Helper to load the API module in a fresh module context
- * AFTER setting an env override. This is required because
- * the base URL is resolved at module import time.
- */
+
 const loadApiWithEnv = async (baseUrl?: string): Promise<ApiModule> => {
   const oldEnv = { ...process.env };
   if (baseUrl === undefined) {
@@ -44,11 +38,9 @@ const loadApiWithEnv = async (baseUrl?: string): Promise<ApiModule> => {
 
   let mod: ApiModule;
   await jest.isolateModulesAsync(async () => {
-    // dynamic import inside isolateModules to force re-evaluation
     mod = (await import('../../api/api')) as ApiModule;
   });
 
-  // restore env for other tests
   process.env = oldEnv;
   return mod!;
 };
@@ -59,7 +51,7 @@ afterEach(() => {
 
 describe('api.ts – base URL resolution', () => {
   test('uses default "/api" when no env or window override', async () => {
-    const api = await loadApiWithEnv(); // no env override
+    const api = await loadApiWithEnv();
     mockFetchOk([{ dam_id: 'X' }]);
 
     const result = await api.fetchAllDams();
@@ -84,7 +76,6 @@ describe('api.ts – endpoints', () => {
   let api: ApiModule;
 
   beforeAll(async () => {
-    // import with default base
     api = await loadApiWithEnv();
   });
 

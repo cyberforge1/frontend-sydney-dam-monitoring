@@ -48,7 +48,6 @@ describe('damResourcesSlice', () => {
     expect(state.latestData).toEqual(mockResponse);
     expect(state.status).toBe('succeeded');
 
-    // fetch(url, undefined) in the API helper → assert second arg
     expect(global.fetch).toHaveBeenCalledWith('/api/latest_data', undefined);
   });
 
@@ -75,7 +74,6 @@ describe('damResourcesSlice', () => {
     expect(state.overallDamAnalysis).toEqual(mockResponse);
     expect(state.status).toBe('succeeded');
 
-    // fetch(url, undefined)
     expect(global.fetch).toHaveBeenCalledWith('/api/overall_dam_analysis', undefined);
   });
 
@@ -102,7 +100,6 @@ describe('damResourcesSlice', () => {
     expect(state.specificDamAnalyses).toEqual(mockResponse);
     expect(state.status).toBe('succeeded');
 
-    // fetch(url, undefined)
     expect(global.fetch).toHaveBeenCalledWith('/api/specific_dam_analysis/1', undefined);
   });
 

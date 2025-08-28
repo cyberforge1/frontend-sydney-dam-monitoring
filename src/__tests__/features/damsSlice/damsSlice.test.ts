@@ -44,9 +44,7 @@ describe('damsSlice', () => {
     expect(state.dams).toEqual(mockResponse);
     expect(state.status).toBe('succeeded');
 
-    // API helper calls fetch(url, undefined)
     expect(global.fetch).toHaveBeenCalledWith('/api/dams', undefined);
-    // (Alternative): expect(global.fetch).toHaveBeenCalledWith('/api/dams', expect.anything());
   });
 
   it('should handle fetchAllDamsThunk rejected', async () => {
@@ -72,9 +70,7 @@ describe('damsSlice', () => {
     expect(state.selectedDam).toEqual(mockResponse);
     expect(state.status).toBe('succeeded');
 
-    // API helper calls fetch(url, undefined)
     expect(global.fetch).toHaveBeenCalledWith('/api/dams/1', undefined);
-    // (Alternative): expect(global.fetch).toHaveBeenCalledWith('/api/dams/1', expect.anything());
   });
 
   it('should handle fetchDamByIdThunk rejected', async () => {

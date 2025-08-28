@@ -43,7 +43,6 @@ describe('damGroupsSlice', () => {
     expect(state.groups).toEqual(mockResponse);
     expect(state.status).toBe('succeeded');
 
-    // fetch is called with (url, undefined) — assert accordingly
     expect(global.fetch).toHaveBeenCalledWith('/api/dam_groups', undefined);
   });
 
@@ -73,7 +72,6 @@ describe('damGroupsSlice', () => {
     expect(state.groupMembers).toEqual(mockResponse);
     expect(state.status).toBe('succeeded');
 
-    // account for URL encoding and the undefined init arg
     expect(global.fetch).toHaveBeenCalledWith(`/api/dam_group_members/${encoded}`, undefined);
   });
 
@@ -89,7 +87,6 @@ describe('damGroupsSlice', () => {
     expect(state.groupMembers).toEqual([]);
     expect(state.status).toBe('failed');
 
-    // Expect the encoded group name in the error string
     expect(state.error).toBe(
       `Error fetching /api/dam_group_members/${encodedBadGroup}: 404 Error - {"message":"Not Found"}`
     );

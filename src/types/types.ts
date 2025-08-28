@@ -19,8 +19,8 @@ export interface DamGroupMember {
 
 export interface DamResource {
   dam_id: string;
-  dam_name?: string;            // ← optional to match API payloads that include it
-  date: string;                 // 'YYYY-MM-DD'
+  dam_name?: string;
+  date: string;
   percentage_full: number;
   storage_volume: number;
   storage_inflow: number;
@@ -29,7 +29,7 @@ export interface DamResource {
 
 export interface DamAnalysis {
   dam_id: string;
-  analysis_date: string;        // 'YYYY-MM-DD'
+  analysis_date: string;
   avg_percentage_full_12_months?: number;
   avg_percentage_full_5_years?: number;
   avg_percentage_full_20_years?: number;
@@ -45,7 +45,7 @@ export interface DamAnalysis {
 }
 
 export interface OverallDamAnalysis {
-  analysis_date: string;        // 'YYYY-MM-DD'
+  analysis_date: string;
   avg_percentage_full_12_months: number;
   avg_percentage_full_5_years: number;
   avg_percentage_full_20_years: number;

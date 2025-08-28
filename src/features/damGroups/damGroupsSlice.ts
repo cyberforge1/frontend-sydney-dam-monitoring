@@ -64,7 +64,7 @@ const damGroupsSlice = createSlice({
       .addCase(fetchDamGroupMembersByGroupNameThunk.pending, (state) => {
         state.status = 'loading';
         state.error = null;
-        state.groupMembers = []; // clear on new selection
+        state.groupMembers = [];
       })
       .addCase(fetchDamGroupMembersByGroupNameThunk.fulfilled, (state, action: PayloadAction<DamGroupMember[]>) => {
         state.status = 'succeeded';

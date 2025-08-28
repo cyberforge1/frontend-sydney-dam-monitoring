@@ -5,15 +5,14 @@ import {
     fetchLatestDataById,
     fetchAllLatestData,
     fetchSpecificDamAnalysisById,
-    fetchAllOverallDamAnalyses, // Import new API
+    fetchAllOverallDamAnalyses,
 } from '../../api/api';
 import { DamResource, DamAnalysis, OverallDamAnalysis } from '../../types/types';
 
-// Define the state interface
 export interface DamResourcesState {
     latestData: DamResource[];
     specificDamAnalyses: DamAnalysis[];
-    overallDamAnalysis: OverallDamAnalysis[]; // New property for overall dam analyses
+    overallDamAnalysis: OverallDamAnalysis[];
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
     error: string | null;
 }
@@ -21,12 +20,11 @@ export interface DamResourcesState {
 const initialState: DamResourcesState = {
     latestData: [],
     specificDamAnalyses: [],
-    overallDamAnalysis: [], // Initialize with empty array
+    overallDamAnalysis: [],
     status: 'idle',
     error: null,
 };
 
-// Thunk to fetch all overall dam analyses
 export const fetchAllOverallDamAnalysesThunk = createAsyncThunk<OverallDamAnalysis[], void>(
     'damResources/fetchAllOverallDamAnalyses',
     async () => {
@@ -35,7 +33,6 @@ export const fetchAllOverallDamAnalysesThunk = createAsyncThunk<OverallDamAnalys
     }
 );
 
-// Existing thunks...
 export const fetchAllLatestDataThunk = createAsyncThunk<DamResource[], void>(
     'damResources/fetchAllLatestData',
     async () => {
@@ -60,7 +57,6 @@ export const fetchSpecificDamAnalysisByIdThunk = createAsyncThunk<
     return response;
 });
 
-// Redux slice
 const damResourcesSlice = createSlice({
     name: 'damResources',
     initialState,
@@ -78,7 +74,6 @@ const damResourcesSlice = createSlice({
                 state.status = 'failed';
                 state.error = action.error.message || 'Failed to fetch overall dam analyses';
             })
-            // Existing reducers for other thunks
             .addCase(fetchAllLatestDataThunk.pending, (state) => {
                 state.status = 'loading';
             })
