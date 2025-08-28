@@ -1,2 +1,2 @@
-# Sydney Dam Monitoring Frontend
+# Water Dashboard NSW Frontend
 

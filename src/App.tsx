@@ -3,8 +3,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import HomePage from './pages/HomePage/HomePage';
-import SelectedDamPage from './pages/SelectedDamPage/SelectedDamPage';
-import DamListPage from './pages/DamListPage/DamListPage';
+import SelectedDamPage from './pages/SelectedDamPage/SelectedDamPage'; // ⬅️ re-enabled
+import DamListPage from './pages/DamListPage/DamListPage';             // ⬅️ re-enabled
 // import PageTwo from './pages/PageTwo/PageTwo';
 // import PageThree from './pages/PageThree/PageThree';
 // import PageFour from './pages/PageFour/PageFour';
@@ -15,7 +15,7 @@ import DamListPage from './pages/DamListPage/DamListPage';
 // import { Provider } from 'react-redux'; // Added Provider for Redux
 // import store from './store/store'; // Import Redux store
 
-import TestingApiCalls from './components/TestingApiCalls/TestingApiCalls'; // <-- tester
+// import TestingApiCalls from './components/TestingApiCalls/TestingApiCalls'; // <-- tester
 import './App.scss';
 
 const App: React.FC = () => {
@@ -26,7 +26,7 @@ const App: React.FC = () => {
 
         <Routes>
           {/* Dedicated endpoint for the tester */}
-          <Route path="/api-test" element={<TestingApiCalls />} />
+          {/* <Route path="/api-test" element={<TestingApiCalls />} /> */}
 
           {/* Home route now renders the actual HomePage */}
           <Route
@@ -45,14 +45,15 @@ const App: React.FC = () => {
             }
           />
 
-          {/* Selected Dam page */}
-          <Route path="/dam" element={<SelectedDamPage />} />
-
           {/* Dam List page */}
-          <Route path="/damlist" element={<DamListPage />} />
+          <Route path="/damlist" element={<DamListPage />} /> {/* ⬅️ re-enabled */}
 
-          {/* 404 → optionally redirect to the tester while you’re building */}
-          <Route path="*" element={<Navigate to="/api-test" replace />} />
+          {/* Selected Dam routes (deep-link + backward compatible) */}
+          <Route path="/dam/:damId" element={<SelectedDamPage />} /> {/* ⬅️ enable param route */}
+          {/* <Route path="/dam" element={<SelectedDamPage />} /> */}
+
+          {/* 404 → optionally redirect to Home while you’re building */}
+          {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
         </Routes>
       </div>
     </Router>

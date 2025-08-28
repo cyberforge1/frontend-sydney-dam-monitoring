@@ -1,13 +1,8 @@
 // src/features/damGroups/damGroupsSlice.ts
-
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import {
-  fetchAllDamGroups,
-  fetchDamGroupMembersByGroupName,
-} from '../../api/api';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { fetchAllDamGroups, fetchDamGroupMembersByGroupName } from '../../api/api';
 import { DamGroup, DamGroupMember } from '../../types/types';
 
-// Define the state interface
 export interface DamGroupsState {
   groups: DamGroup[];
   groupMembers: DamGroupMember[];
@@ -22,22 +17,28 @@ const initialState: DamGroupsState = {
   error: null,
 };
 
-// Thunk to fetch all dam groups
-export const fetchAllDamGroupsThunk = createAsyncThunk<DamGroup[], void>(
-  'damGroups/fetchAllDamGroups',
-  async () => {
-    const response = await fetchAllDamGroups();
-    return response;
+export const fetchAllDamGroupsThunk = createAsyncThunk<
+  DamGroup[],
+  void,
+  { rejectValue: string }
+>('damGroups/fetchAllDamGroups', async (_, { rejectWithValue }) => {
+  try {
+    return await fetchAllDamGroups();
+  } catch (e: any) {
+    return rejectWithValue(e?.message ?? 'Failed to fetch dam groups');
   }
-);
+});
 
-// Thunk to fetch dam group members by group name
 export const fetchDamGroupMembersByGroupNameThunk = createAsyncThunk<
   DamGroupMember[],
-  string
->('damGroups/fetchDamGroupMembersByGroupName', async (groupName: string) => {
-  const response = await fetchDamGroupMembersByGroupName(groupName);
-  return response;
+  string,
+  { rejectValue: string }
+>('damGroups/fetchDamGroupMembersByGroupName', async (groupName, { rejectWithValue }) => {
+  try {
+    return await fetchDamGroupMembersByGroupName(groupName);
+  } catch (e: any) {
+    return rejectWithValue(e?.message ?? `Failed to fetch members for ${groupName}`);
+  }
 });
 
 const damGroupsSlice = createSlice({
@@ -46,27 +47,32 @@ const damGroupsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // groups
       .addCase(fetchAllDamGroupsThunk.pending, (state) => {
         state.status = 'loading';
+        state.error = null;
       })
-      .addCase(fetchAllDamGroupsThunk.fulfilled, (state, action) => {
+      .addCase(fetchAllDamGroupsThunk.fulfilled, (state, action: PayloadAction<DamGroup[]>) => {
         state.status = 'succeeded';
         state.groups = action.payload;
       })
       .addCase(fetchAllDamGroupsThunk.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.error.message || 'Failed to fetch dam groups';
+        state.error = action.payload ?? action.error.message ?? 'Failed to fetch dam groups';
       })
+      // members
       .addCase(fetchDamGroupMembersByGroupNameThunk.pending, (state) => {
         state.status = 'loading';
+        state.error = null;
+        state.groupMembers = []; // clear on new selection
       })
-      .addCase(fetchDamGroupMembersByGroupNameThunk.fulfilled, (state, action) => {
+      .addCase(fetchDamGroupMembersByGroupNameThunk.fulfilled, (state, action: PayloadAction<DamGroupMember[]>) => {
         state.status = 'succeeded';
         state.groupMembers = action.payload;
       })
       .addCase(fetchDamGroupMembersByGroupNameThunk.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.error.message || 'Failed to fetch dam group members';
+        state.error = action.payload ?? action.error.message ?? 'Failed to fetch dam group members';
       });
   },
 });

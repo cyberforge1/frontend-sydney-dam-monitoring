@@ -1,60 +1,50 @@
 // # src/graphs/DamCapacityGraph/DamCapacityGraph.tsx
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart, registerables } from 'chart.js';
-import { useSelector, useDispatch } from 'react-redux';
-import { AppDispatch, RootState } from '../../store/store';
-import { fetchSpecificDamAnalysisByIdThunk } from '../../features/damResources/damResourcesSlice';
+import './DamCapacityGraph.scss';
+import { DamAnalysis } from '../../types/types';
 
 Chart.register(...registerables);
 
 interface DamCapacityGraphProps {
-    damId: string;
+  damName: string;
+  series: DamAnalysis[]; // analysis rows for THIS dam, sorted or unsorted
 }
 
-const DamCapacityGraph: React.FC<DamCapacityGraphProps> = ({ damId }) => {
-    const dispatch = useDispatch<AppDispatch>();
-    const { specificDamAnalyses, status, error } = useSelector((state: RootState) => state.damResources);
-    const { selectedDam } = useSelector((state: RootState) => state.dams);
+const DamCapacityGraph: React.FC<DamCapacityGraphProps> = ({ damName, series }) => {
+  if (!series || series.length === 0) {
+    return <div> No analysis available for {damName}.</div>;
+  }
 
-    useEffect(() => {
-        dispatch(fetchSpecificDamAnalysisByIdThunk(damId));
-    }, [dispatch, damId]);
+  // Sort by date (ascending) so the line moves left→right over time
+  const sorted = [...series].sort(
+    (a, b) => new Date(a.analysis_date).getTime() - new Date(b.analysis_date).getTime()
+  );
 
-    if (status === 'loading') {
-        return <div>Loading graph data...</div>;
-    }
+  const labels = sorted.map((d) => d.analysis_date);
+  const percentages = sorted.map((d) => d.avg_percentage_full_12_months ?? 0);
 
-    if (error) {
-        return <div>Error: {error}</div>;
-    }
+  const chartData = {
+    labels,
+    datasets: [
+      {
+        label: 'Dam Capacity % (12 mo avg)',
+        data: percentages,
+        fill: false,
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.1,
+      },
+    ],
+  };
 
-    const damData = specificDamAnalyses;
-    const damName = selectedDam?.dam_name || 'Dam';
-
-    const labels = damData.map((d) => d.analysis_date);
-    const percentages = damData.map((d) => d.avg_percentage_full_12_months || 0);
-
-    const chartData = {
-        labels,
-        datasets: [
-            {
-                label: 'Dam Capacity Percentage',
-                data: percentages,
-                fill: false,
-                borderColor: 'rgb(75, 192, 192)',
-                tension: 0.1,
-            },
-        ],
-    };
-
-    return (
-        <div style={{ textAlign: 'center' }}>
-            <h2>{damName} Capacity Percentage Over 12 Months</h2>
-            <Line data={chartData} options={{ maintainAspectRatio: false }} />
-        </div>
-    );
+  return (
+    <div className="dam-capacity-graph" style={{ textAlign: 'center' }}>
+      <h2>{damName} Capacity Percentage (12 mo avg)</h2>
+      <Line data={chartData} options={{ maintainAspectRatio: false }} />
+    </div>
+  );
 };
 
 export default DamCapacityGraph;

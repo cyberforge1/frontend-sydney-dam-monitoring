@@ -1,7 +1,8 @@
 // # src/pages/SelectedDamPage/SelectedDamPage.tsx
+// (only showing the changed core; keep your styles & buttons)
 
-import React, { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppDispatch, RootState } from '../../store/store';
 import { fetchDamByIdThunk } from '../../features/dams/damsSlice';
@@ -13,113 +14,68 @@ import NetInflowReleaseGraph from '../../graphs/NetInflowReleaseGraph/NetInflowR
 import './SelectedDamPage.scss';
 
 const SelectedDamPage: React.FC = () => {
-    const location = useLocation();
-    const navigate = useNavigate();
-    const dispatch = useDispatch<AppDispatch>();
+  const { damId: routeDamId } = useParams<{ damId: string }>();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
 
-    const { selectedDam, status: damStatus, error: damError } = useSelector((state: RootState) => state.dams);
-    const { specificDamAnalyses, status: resourceStatus, error: resourceError } = useSelector((state: RootState) => state.damResources);
+  const damId =
+    routeDamId || location.state?.damData?.dam_id || location.state?.damId || '';
 
-    const damId = location.state?.damData?.dam_id || location.state?.damId;
+  const { dams, selectedDam, status: damsStatus, error: damsError } = useSelector((s: RootState) => s.dams);
+  const { specificDamAnalyses, status: analysisStatus, error: analysisError } = useSelector((s: RootState) => s.damResources);
 
-    useEffect(() => {
-        if (damId && damStatus === 'idle') {
-            dispatch(fetchDamByIdThunk(damId));
-        }
+  // Prefer cached dam record
+  const damRecord = useMemo(() => {
+    return dams.find(d => d.dam_id === damId) || (selectedDam?.dam_id === damId ? selectedDam : null);
+  }, [dams, selectedDam, damId]);
 
-        if (damId && resourceStatus === 'idle') {
-            dispatch(fetchSpecificDamAnalysisByIdThunk(damId));
-        }
-    }, [damId, damStatus, resourceStatus, dispatch]);
+  // Filter analysis rows for this dam
+  const series = useMemo(() => {
+    return specificDamAnalyses.filter(a => a.dam_id === damId);
+  }, [specificDamAnalyses, damId]);
 
-    if (damStatus === 'loading' || resourceStatus === 'loading') {
-        return <div>Loading...</div>;
-    }
+  // Fetch only what we need
+  useEffect(() => {
+    if (!damId) return;
+    if (!damRecord) dispatch(fetchDamByIdThunk(damId));
+    // Always ensure we have analysis for this dam
+    if (series.length === 0) dispatch(fetchSpecificDamAnalysisByIdThunk(damId));
+  }, [dispatch, damId, damRecord, series.length]);
 
-    if (damError || resourceError) {
-        return <div>Error: {damError || resourceError}</div>;
-    }
+  // Guards
+  if (!damId) return <div>No dam selected.</div>;
+  if (!damRecord && (damsStatus === 'loading' || analysisStatus === 'loading')) return <div>Loading…</div>;
+  if (!damRecord && (damsError || analysisError)) return <div>Error: {damsError || analysisError}</div>;
+  if (!damRecord) return <div>No dam data available.</div>;
 
-    if (!selectedDam) {
-        return <div>No dam data available.</div>;
-    }
+  const { dam_name, latitude = 0, longitude = 0 } = damRecord;
 
-    const damName = selectedDam.dam_name;
-    const latitude = selectedDam.latitude ? selectedDam.latitude.toString() : '0';
-    const longitude = selectedDam.longitude ? selectedDam.longitude.toString() : '0';
+  return (
+    <div className="selected-dam-page">
+      <button className="back-button" onClick={() => navigate('/')} type="button">Back</button>
 
-    const avgPercentageFull12Months = specificDamAnalyses[0]?.avg_percentage_full_12_months || null;
-    const avgPercentageFull5Years = specificDamAnalyses[0]?.avg_percentage_full_5_years || null;
-    const avgPercentageFull20Years = specificDamAnalyses[0]?.avg_percentage_full_20_years || null;
+      <div className="dam-header"><h1>{dam_name} Insights</h1></div>
 
-    const handleBackClick = () => {
-        navigate('/');
-    };
-
-    return (
-        <div className="selected-dam-page">
-            <button className="back-button" onClick={handleBackClick}>Back</button>
-            <div className="dam-header">
-                <h1>{damName} Insights</h1>
-            </div>
-            <div className="content-row">
-                <div className="dam-content">
-                    <DamCapacityGraph damId={damId} />
-                </div>
-                <div className="dam-content">
-                    <NetInflowReleaseGraph damId={damId} />
-                </div>
-            </div>
-            <div className="content-row">
-                <DamContent>
-                    <div style={{ 
-                        display: 'flex', 
-                        flexDirection: 'column', 
-                        justifyContent: 'center', 
-                        alignItems: 'center', 
-                        textAlign: 'center', 
-                        height: '100%', 
-                        width: '100%', 
-                        fontSize: '1.5rem' 
-                    }}>
-                        <p style={{ width: '100%', marginBottom: '20px' }}>
-                            <span style={{ marginRight: '0.5rem' }}>{damName} Average Percentage Full (12 Months):</span> 
-                            {avgPercentageFull12Months !== null ? (
-                                <span style={{ fontWeight: 'bold' }}>
-                                    {avgPercentageFull12Months.toFixed(2) + '%'}
-                                </span>
-                            ) : (
-                                <i className="fas fa-spinner fa-spin"></i>
-                            )}
-                        </p>
-                        <p style={{ width: '100%', marginBottom: '20px' }}>
-                            <span style={{ marginRight: '0.5rem' }}>{damName} Average Percentage Full (5 Years):</span>
-                            {avgPercentageFull5Years !== null ? (
-                                <span style={{ fontWeight: 'bold' }}>
-                                    {avgPercentageFull5Years.toFixed(2) + '%'}
-                                </span>
-                            ) : (
-                                <i className="fas fa-spinner fa-spin"></i>
-                            )}
-                        </p>
-                        <p style={{ width: '100%' }}>
-                            <span style={{ marginRight: '0.5rem' }}>{damName} Average Percentage Full (20 Years):</span>
-                            {avgPercentageFull20Years !== null ? (
-                                <span style={{ fontWeight: 'bold' }}>
-                                    {avgPercentageFull20Years.toFixed(2) + '%'}
-                                </span>
-                            ) : (
-                                <i className="fas fa-spinner fa-spin"></i>
-                            )}
-                        </p>
-                    </div>
-                </DamContent>
-                <div className="dam-content">
-                    <GoogleMapComponent lat={parseFloat(latitude)} lng={parseFloat(longitude)} />
-                </div>
-            </div>
+      <div className="content-row">
+        <div className="dam-content">
+          <DamCapacityGraph damName={dam_name} series={series} />
         </div>
-    );
+        <div className="dam-content">
+          <NetInflowReleaseGraph damName={dam_name} series={series} />
+        </div>
+      </div>
+
+      <div className="content-row">
+        <DamContent damId={damId}>
+          {/* Optional: any summary boxes using series[0] averages */}
+        </DamContent>
+        <div className="dam-content">
+          <GoogleMapComponent lat={Number(latitude)} lng={Number(longitude)} />
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default SelectedDamPage;
