@@ -13,7 +13,7 @@ import { fetchAllDamsThunk } from '../../features/dams/damsSlice';
 import { fetchAllLatestDataThunk } from '../../features/damResources/damResourcesSlice';
 
 import DamGroupSelector from '../../components/DamGroupSelector/DamGroupSelector';
-import TopDamsPieCharts from '../../containers/TopDamsPieCharts/TopDamsPieCharts';
+import TopDamsPieCharts from '../../graphs/TopDamsPieCharts/TopDamsPieCharts';
 import SearchForDam from '../../components/SearchForDam/SearchForDam';
 import OpenListOfDams from '../../components/OpenListOfDams/OpenListOfDams';
 
