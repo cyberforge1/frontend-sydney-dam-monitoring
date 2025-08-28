@@ -1,166 +1,227 @@
 // src/__tests__/api/api.test.ts
 
-import {
-  fetchAllDams,
-  fetchDamById,
-  fetchAllLatestData,
-  fetchLatestDataById,
-  fetchSpecificDamAnalysisById,
-  fetchAllDamGroups,
-  fetchDamGroupByName,
-  fetchDamGroupMembersByGroupName,
-  fetchAllOverallDamAnalyses,
-  fetchOverallDamAnalysisByDate,
-} from '../../api/api';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-const mockData = {
-  dams: [
-    {
-      dam_id: '203042',
-      dam_name: 'Toonumbar Dam',
-      full_volume: 10814,
-      latitude: -28.602383,
-      longitude: 152.763769,
-    },
-  ],
-  damGroups: [
-    { group_name: 'small_dams' },
-    { group_name: 'large_dams' },
-  ],
-  damGroupMembers: [
-    { group_name: 'small_dams', dam_id: '203042' },
-    { group_name: 'large_dams', dam_id: '210097' },
-  ],
-  latestData: [
-    {
-      dam_id: '203042',
-      dam_name: 'Toonumbar Dam',
-      date: '2024-11-25',
-      storage_volume: 10500.0,
-      percentage_full: 97.0,
-      storage_inflow: 500.5,
-      storage_release: 300.3,
-    },
-  ],
-  specificDamAnalysis: [
-    {
-      dam_id: '203042',
-      analysis_date: '2024-11-01',
-      avg_storage_volume_12_months: 10500.0,
-    },
-  ],
-  overallDamAnalysis: [
-    {
-      analysis_date: '2023-01-01',
-      avg_storage_volume_12_months: 10500.0,
-    },
-  ],
+type ApiModule = typeof import('../../api/api');
+
+const mockFetchOk = (payload: unknown) =>
+  (global.fetch = jest.fn(() =>
+    Promise.resolve({
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: async () => payload,
+      text: async () => JSON.stringify(payload),
+    } as any)
+  ) as jest.Mock);
+
+const mockFetchError = (status: number, statusText = 'Error', body = 'Not Found') =>
+  (global.fetch = jest.fn(() =>
+    Promise.resolve({
+      ok: false,
+      status,
+      statusText,
+      json: async () => {
+        throw new Error('no json for error');
+      },
+      text: async () => body,
+    } as any)
+  ) as jest.Mock);
+
+/**
+ * Helper to load the API module in a fresh module context
+ * AFTER setting an env override. This is required because
+ * the base URL is resolved at module import time.
+ */
+const loadApiWithEnv = async (baseUrl?: string): Promise<ApiModule> => {
+  const oldEnv = { ...process.env };
+  if (baseUrl === undefined) {
+    delete process.env.VITE_API_BASE_URL;
+    delete process.env.API_BASE_URL;
+  } else {
+    process.env.VITE_API_BASE_URL = baseUrl;
+  }
+
+  let mod: ApiModule;
+  await jest.isolateModulesAsync(async () => {
+    // dynamic import inside isolateModules to force re-evaluation
+    mod = (await import('../../api/api')) as ApiModule;
+  });
+
+  // restore env for other tests
+  process.env = oldEnv;
+  return mod!;
 };
 
-describe('API methods', () => {
-  const mockFetch = (mockResponse: unknown, status = 200) => {
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        ok: status >= 200 && status < 300,
-        status,
-        statusText: 'OK',
-        json: () => Promise.resolve(mockResponse),
-        text: () => Promise.resolve(JSON.stringify(mockResponse)),
-      })
-    ) as jest.Mock;
-  };
+afterEach(() => {
+  jest.clearAllMocks();
+});
 
-  afterEach(() => {
-    jest.clearAllMocks();
+describe('api.ts – base URL resolution', () => {
+  test('uses default "/api" when no env or window override', async () => {
+    const api = await loadApiWithEnv(); // no env override
+    mockFetchOk([{ dam_id: 'X' }]);
+
+    const result = await api.fetchAllDams();
+    expect(result).toEqual([{ dam_id: 'X' }]);
+    expect(global.fetch).toHaveBeenCalledWith('/api/dams', undefined);
   });
 
-  describe('fetchAllDams', () => {
-    it('should return all dams', async () => {
-      mockFetch(mockData.dams);
-      const result = await fetchAllDams();
-      expect(result).toEqual(mockData.dams);
-      expect(global.fetch).toHaveBeenCalledWith('/api/dams');
-    });
+  test('uses process.env.VITE_API_BASE_URL when provided', async () => {
+    const api = await loadApiWithEnv('http://localhost:5000/api');
+    mockFetchOk({ dam_id: '123' });
+
+    const result = await api.fetchDamById('123');
+    expect(result).toEqual({ dam_id: '123' });
+    expect(global.fetch).toHaveBeenCalledWith(
+      'http://localhost:5000/api/dams/123',
+      undefined
+    );
+  });
+});
+
+describe('api.ts – endpoints', () => {
+  let api: ApiModule;
+
+  beforeAll(async () => {
+    // import with default base
+    api = await loadApiWithEnv();
   });
 
-  describe('fetchDamById', () => {
-    it('should return a dam by ID', async () => {
-      mockFetch(mockData.dams[0]);
-      const result = await fetchDamById('203042');
-      expect(result).toEqual(mockData.dams[0]);
-      expect(global.fetch).toHaveBeenCalledWith('/api/dams/203042');
-    });
+  test('fetchAllDams', async () => {
+    const dams = [
+      { dam_id: '203042', dam_name: 'Toonumbar Dam' },
+      { dam_id: '210097', dam_name: 'Glenbawn Dam' },
+    ];
+    mockFetchOk(dams);
+
+    const res = await api.fetchAllDams();
+    expect(res).toEqual(dams);
+    expect(global.fetch).toHaveBeenCalledWith('/api/dams', undefined);
   });
 
-  describe('fetchAllLatestData', () => {
-    it('should return all latest dam data', async () => {
-      mockFetch(mockData.latestData);
-      const result = await fetchAllLatestData();
-      expect(result).toEqual(mockData.latestData);
-      expect(global.fetch).toHaveBeenCalledWith('/api/latest_data');
-    });
+  test('fetchDamById', async () => {
+    const dam = { dam_id: '203042', dam_name: 'Toonumbar Dam' };
+    mockFetchOk(dam);
+
+    const res = await api.fetchDamById('203042');
+    expect(res).toEqual(dam);
+    expect(global.fetch).toHaveBeenCalledWith('/api/dams/203042', undefined);
   });
 
-  describe('fetchLatestDataById', () => {
-    it('should return latest data for a specific dam', async () => {
-      mockFetch(mockData.latestData[0]);
-      const result = await fetchLatestDataById('203042');
-      expect(result).toEqual(mockData.latestData[0]);
-      expect(global.fetch).toHaveBeenCalledWith('/api/latest_data/203042');
-    });
+  test('fetchAllLatestData', async () => {
+    const latest = [
+      {
+        dam_id: '203042',
+        date: '2024-11-25',
+        percentage_full: 97,
+        storage_volume: 10500,
+        storage_inflow: 500.5,
+        storage_release: 300.3,
+      },
+    ];
+    mockFetchOk(latest);
+
+    const res = await api.fetchAllLatestData();
+    expect(res).toEqual(latest);
+    expect(global.fetch).toHaveBeenCalledWith('/api/latest_data', undefined);
   });
 
-  describe('fetchSpecificDamAnalysisById', () => {
-    it('should return specific dam analysis by dam ID', async () => {
-      mockFetch(mockData.specificDamAnalysis);
-      const result = await fetchSpecificDamAnalysisById('203042');
-      expect(result).toEqual(mockData.specificDamAnalysis);
-      expect(global.fetch).toHaveBeenCalledWith('/api/specific_dam_analysis/203042');
-    });
+  test('fetchLatestDataById', async () => {
+    const latest = {
+      dam_id: '203042',
+      date: '2024-11-25',
+      percentage_full: 97,
+      storage_volume: 10500,
+      storage_inflow: 500.5,
+      storage_release: 300.3,
+    };
+    mockFetchOk(latest);
+
+    const res = await api.fetchLatestDataById('203042');
+    expect(res).toEqual(latest);
+    expect(global.fetch).toHaveBeenCalledWith('/api/latest_data/203042', undefined);
   });
 
-  describe('fetchAllDamGroups', () => {
-    it('should return all dam groups', async () => {
-      mockFetch(mockData.damGroups);
-      const result = await fetchAllDamGroups();
-      expect(result).toEqual(mockData.damGroups);
-      expect(global.fetch).toHaveBeenCalledWith('/api/dam_groups');
-    });
+  test('fetchSpecificDamAnalysisById', async () => {
+    const analysis = [
+      { dam_id: '203042', analysis_date: '2024-11-01', avg_storage_volume_12_months: 10500 },
+    ];
+    mockFetchOk(analysis);
+
+    const res = await api.fetchSpecificDamAnalysisById('203042');
+    expect(res).toEqual(analysis);
+    expect(global.fetch).toHaveBeenCalledWith(
+      '/api/specific_dam_analysis/203042',
+      undefined
+    );
   });
 
-  describe('fetchDamGroupByName', () => {
-    it('should return a dam group by name', async () => {
-      mockFetch(mockData.damGroups[0]);
-      const result = await fetchDamGroupByName('small_dams');
-      expect(result).toEqual(mockData.damGroups[0]);
-      expect(global.fetch).toHaveBeenCalledWith('/api/dam_groups/small_dams');
-    });
+  test('fetchAllDamGroups', async () => {
+    const groups = [{ group_name: 'small_dams' }, { group_name: 'large_dams' }];
+    mockFetchOk(groups);
+
+    const res = await api.fetchAllDamGroups();
+    expect(res).toEqual(groups);
+    expect(global.fetch).toHaveBeenCalledWith('/api/dam_groups', undefined);
   });
 
-  describe('fetchDamGroupMembersByGroupName', () => {
-    it('should return members of a dam group', async () => {
-      mockFetch(mockData.damGroupMembers);
-      const result = await fetchDamGroupMembersByGroupName('small_dams');
-      expect(result).toEqual(mockData.damGroupMembers);
-      expect(global.fetch).toHaveBeenCalledWith('/api/dam_group_members/small_dams');
-    });
+  test('fetchDamGroupByName', async () => {
+    const group = { group_name: 'small_dams' };
+    mockFetchOk(group);
+
+    const res = await api.fetchDamGroupByName('small_dams');
+    expect(res).toEqual(group);
+    expect(global.fetch).toHaveBeenCalledWith('/api/dam_groups/small_dams', undefined);
   });
 
-  describe('fetchAllOverallDamAnalyses', () => {
-    it('should return overall dam analyses', async () => {
-      mockFetch(mockData.overallDamAnalysis);
-      const result = await fetchAllOverallDamAnalyses();
-      expect(result).toEqual(mockData.overallDamAnalysis);
-      expect(global.fetch).toHaveBeenCalledWith('/api/overall_dam_analysis');
-    });
+  test('fetchDamGroupMembersByGroupName', async () => {
+    const members = [
+      { group_name: 'small_dams', dam_id: '203042' },
+      { group_name: 'small_dams', dam_id: '210001' },
+    ];
+    mockFetchOk(members);
+
+    const res = await api.fetchDamGroupMembersByGroupName('small_dams');
+    expect(res).toEqual(members);
+    expect(global.fetch).toHaveBeenCalledWith(
+      '/api/dam_group_members/small_dams',
+      undefined
+    );
   });
 
-  describe('fetchOverallDamAnalysisByDate', () => {
-    it('should return overall dam analysis by date', async () => {
-      mockFetch(mockData.overallDamAnalysis[0]);
-      const result = await fetchOverallDamAnalysisByDate('2023-01-01');
-      expect(result).toEqual(mockData.overallDamAnalysis[0]);
-      expect(global.fetch).toHaveBeenCalledWith('/api/overall_dam_analysis/2023-01-01');
-    });
+  test('fetchAllOverallDamAnalyses', async () => {
+    const overall = [
+      { analysis_date: '2023-01-01', avg_storage_volume_12_months: 10500 },
+    ];
+    mockFetchOk(overall);
+
+    const res = await api.fetchAllOverallDamAnalyses();
+    expect(res).toEqual(overall);
+    expect(global.fetch).toHaveBeenCalledWith('/api/overall_dam_analysis', undefined);
+  });
+
+  test('fetchOverallDamAnalysisByDate', async () => {
+    const row = { analysis_date: '2023-01-01', avg_storage_volume_12_months: 10500 };
+    mockFetchOk(row);
+
+    const res = await api.fetchOverallDamAnalysisByDate('2023-01-01');
+    expect(res).toEqual(row);
+    expect(global.fetch).toHaveBeenCalledWith(
+      '/api/overall_dam_analysis/2023-01-01',
+      undefined
+    );
+  });
+});
+
+describe('api.ts – error surfaces body text', () => {
+  test('returns a helpful error message when response is not ok', async () => {
+    const api = await loadApiWithEnv();
+    mockFetchError(404, 'Not Found', 'No such dam');
+
+    await expect(api.fetchDamById('missing-one')).rejects.toThrow(
+      /404 Not Found - No such dam/
+    );
+    expect(global.fetch).toHaveBeenCalledWith('/api/dams/missing-one', undefined);
   });
 });

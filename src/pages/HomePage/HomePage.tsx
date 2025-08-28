@@ -2,17 +2,21 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../store/store';
+import type { AppDispatch, RootState } from '../../store/store';
+
 import {
   fetchAllDamGroupsThunk,
   fetchDamGroupMembersByGroupNameThunk,
 } from '../../features/damGroups/damGroupsSlice';
+
 import { fetchAllDamsThunk } from '../../features/dams/damsSlice';
 import { fetchAllLatestDataThunk } from '../../features/damResources/damResourcesSlice';
-import TopDamsPieCharts from '../../containers/TopDamsPieCharts/TopDamsPieCharts';
+
 import DamGroupSelector from '../../components/DamGroupSelector/DamGroupSelector';
+import TopDamsPieCharts from '../../containers/TopDamsPieCharts/TopDamsPieCharts';
 import SearchForDam from '../../components/SearchForDam/SearchForDam';
 import OpenListOfDams from '../../components/OpenListOfDams/OpenListOfDams';
+
 import './HomePage.scss';
 
 const PREFERRED_DEFAULT = 'sydney_dams';
@@ -20,48 +24,52 @@ const PREFERRED_DEFAULT = 'sydney_dams';
 const HomePage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  // Groups & members
-  const { groups, groupMembers, status: groupsStatus, error: groupsError } = useSelector(
-    (s: RootState) => s.damGroups
-  );
-
-  // Global caches (fetched once here for all cards)
+  // Slices
   const dams = useSelector((s: RootState) => s.dams.dams);
   const latestData = useSelector((s: RootState) => s.damResources.latestData);
 
+  const {
+    groups,
+    groupMembers,
+    status: groupsStatus,
+    error: groupsError,
+  } = useSelector((s: RootState) => s.damGroups);
+
+  // Local UI state
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const lastFetchedGroupRef = useRef<string | null>(null);
 
-  // Fetch shared datasets ONCE so cards can render without dispatching
+  // Preload global caches ONCE (so cards render without extra fetches)
   useEffect(() => {
     if (dams.length === 0) dispatch(fetchAllDamsThunk());
     if (latestData.length === 0) dispatch(fetchAllLatestDataThunk());
   }, [dispatch, dams.length, latestData.length]);
 
-  // Load groups once
+  // Load list of groups ONCE
   useEffect(() => {
     if (groupsStatus === 'idle' && groups.length === 0) {
       dispatch(fetchAllDamGroupsThunk());
     }
   }, [dispatch, groupsStatus, groups.length]);
 
-  // Resolve default group as soon as groups are available
+  // Resolve default group when groups arrive
   const defaultGroup = useMemo(() => {
     if (!groups.length) return null;
     return (
-      groups.find((g) => g.group_name === PREFERRED_DEFAULT)?.group_name ??
+      groups.find(g => g.group_name === PREFERRED_DEFAULT)?.group_name ??
       groups[0]?.group_name ??
       null
     );
   }, [groups]);
 
+  // Initialize selected group when default is known
   useEffect(() => {
     if (!selectedGroup && defaultGroup) {
       setSelectedGroup(defaultGroup);
     }
   }, [defaultGroup, selectedGroup]);
 
-  // Fetch group members whenever selection changes (dedupe)
+  // Fetch members when selection changes (dedupe multiple identical requests)
   useEffect(() => {
     if (!selectedGroup) return;
     if (lastFetchedGroupRef.current === selectedGroup) return;
@@ -69,8 +77,10 @@ const HomePage: React.FC = () => {
     dispatch(fetchDamGroupMembersByGroupNameThunk(selectedGroup));
   }, [dispatch, selectedGroup]);
 
+  // Simple derived loading flags
   const loadingGroups = groupsStatus === 'loading' && groups.length === 0;
-  const loadingMembers = groupsStatus === 'loading' && groups.length > 0;
+  const loadingMembers =
+    groupsStatus === 'loading' && groups.length > 0 && !!selectedGroup;
 
   return (
     <div className="homepage">
@@ -93,12 +103,18 @@ const HomePage: React.FC = () => {
       <div className="top-dams-pie-charts-container">
         {loadingGroups && <div>Loading groups…</div>}
         {groupsError && <div>Error: {groupsError}</div>}
+
         {!groupsError && !loadingGroups && selectedGroup && loadingMembers && (
-          <div>Loading data for group: {selectedGroup}…</div>
+          <div>Loading data for: {selectedGroup}…</div>
         )}
-        {!groupsError && !loadingMembers && groupMembers.length === 0 && selectedGroup && (
-          <div>No data available for the selected group.</div>
-        )}
+
+        {!groupsError &&
+          !loadingMembers &&
+          selectedGroup &&
+          groupMembers.length === 0 && (
+            <div>No data available for the selected group.</div>
+          )}
+
         {groupMembers.length > 0 && <TopDamsPieCharts damData={groupMembers} />}
       </div>
     </div>

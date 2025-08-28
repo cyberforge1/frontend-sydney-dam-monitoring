@@ -21,7 +21,7 @@ describe('damsSlice', () => {
   };
 
   afterEach(() => {
-    jest.clearAllMocks(); // Clear mocks after each test
+    jest.clearAllMocks();
   });
 
   it('should handle initial state', () => {
@@ -29,7 +29,7 @@ describe('damsSlice', () => {
     expect(initialState).toEqual({
       dams: [],
       selectedDam: null,
-      status: 'idle', // Matches union type
+      status: 'idle',
       error: null,
     });
   });
@@ -42,8 +42,11 @@ describe('damsSlice', () => {
     await store.dispatch(fetchAllDamsThunk());
     const state = store.getState();
     expect(state.dams).toEqual(mockResponse);
-    expect(state.status).toBe('succeeded'); // Matches union type
-    expect(global.fetch).toHaveBeenCalledWith('/api/dams');
+    expect(state.status).toBe('succeeded');
+
+    // API helper calls fetch(url, undefined)
+    expect(global.fetch).toHaveBeenCalledWith('/api/dams', undefined);
+    // (Alternative): expect(global.fetch).toHaveBeenCalledWith('/api/dams', expect.anything());
   });
 
   it('should handle fetchAllDamsThunk rejected', async () => {
@@ -53,7 +56,7 @@ describe('damsSlice', () => {
     await store.dispatch(fetchAllDamsThunk());
     const state = store.getState();
     expect(state.dams).toEqual([]);
-    expect(state.status).toBe('failed'); // Matches union type
+    expect(state.status).toBe('failed');
     expect(state.error).toBe(
       'Error fetching /api/dams: 500 Error - {"message":"Failed to fetch dams"}'
     );
@@ -67,8 +70,11 @@ describe('damsSlice', () => {
     await store.dispatch(fetchDamByIdThunk('1'));
     const state = store.getState();
     expect(state.selectedDam).toEqual(mockResponse);
-    expect(state.status).toBe('succeeded'); // Matches union type
-    expect(global.fetch).toHaveBeenCalledWith('/api/dams/1');
+    expect(state.status).toBe('succeeded');
+
+    // API helper calls fetch(url, undefined)
+    expect(global.fetch).toHaveBeenCalledWith('/api/dams/1', undefined);
+    // (Alternative): expect(global.fetch).toHaveBeenCalledWith('/api/dams/1', expect.anything());
   });
 
   it('should handle fetchDamByIdThunk rejected', async () => {
@@ -78,7 +84,7 @@ describe('damsSlice', () => {
     await store.dispatch(fetchDamByIdThunk('invalid-id'));
     const state = store.getState();
     expect(state.selectedDam).toBe(null);
-    expect(state.status).toBe('failed'); // Matches union type
+    expect(state.status).toBe('failed');
     expect(state.error).toBe(
       'Error fetching /api/dams/invalid-id: 404 Error - {"message":"Failed to fetch dam details"}'
     );
@@ -88,7 +94,7 @@ describe('damsSlice', () => {
     const initialState = {
       dams: [],
       selectedDam: { dam_id: '1', dam_name: 'Dam A' },
-      status: 'idle' as const, // Use as const for type assertion
+      status: 'idle' as const,
       error: null,
     };
 

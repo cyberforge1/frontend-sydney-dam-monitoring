@@ -46,10 +46,10 @@ const App: React.FC = () => {
           />
 
           {/* Dam List page */}
-          <Route path="/damlist" element={<DamListPage />} /> {/* ⬅️ re-enabled */}
+          {/* <Route path="/damlist" element={<DamListPage />} /> */}
 
           {/* Selected Dam routes (deep-link + backward compatible) */}
-          <Route path="/dam/:damId" element={<SelectedDamPage />} /> {/* ⬅️ enable param route */}
+          {/* <Route path="/dam/:damId" element={<SelectedDamPage />} />  */}
           {/* <Route path="/dam" element={<SelectedDamPage />} /> */}
 
           {/* 404 → optionally redirect to Home while you’re building */}

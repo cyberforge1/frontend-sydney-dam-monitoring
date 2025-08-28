@@ -20,7 +20,7 @@ describe('damGroupsSlice', () => {
   };
 
   afterEach(() => {
-    jest.clearAllMocks(); // Clear fetch mock after each test
+    jest.clearAllMocks();
   });
 
   it('should handle initial state', () => {
@@ -42,7 +42,9 @@ describe('damGroupsSlice', () => {
     const state = store.getState();
     expect(state.groups).toEqual(mockResponse);
     expect(state.status).toBe('succeeded');
-    expect(global.fetch).toHaveBeenCalledWith('/api/dam_groups');
+
+    // fetch is called with (url, undefined) — assert accordingly
+    expect(global.fetch).toHaveBeenCalledWith('/api/dam_groups', undefined);
   });
 
   it('should handle fetchAllDamGroupsThunk rejected', async () => {
@@ -63,23 +65,33 @@ describe('damGroupsSlice', () => {
     const mockResponse = [{ dam_id: '123', dam_name: 'Dam 1' }];
     mockFetch(mockResponse);
 
-    await store.dispatch(fetchDamGroupMembersByGroupNameThunk('Group 1'));
+    const groupName = 'Group 1';
+    const encoded = encodeURIComponent(groupName);
+
+    await store.dispatch(fetchDamGroupMembersByGroupNameThunk(groupName));
     const state = store.getState();
     expect(state.groupMembers).toEqual(mockResponse);
     expect(state.status).toBe('succeeded');
-    expect(global.fetch).toHaveBeenCalledWith('/api/dam_group_members/Group 1');
+
+    // account for URL encoding and the undefined init arg
+    expect(global.fetch).toHaveBeenCalledWith(`/api/dam_group_members/${encoded}`, undefined);
   });
 
   it('should handle fetchDamGroupMembersByGroupNameThunk rejected', async () => {
     const store = configureStore({ reducer });
     mockFetch({ message: 'Not Found' }, 404);
 
-    await store.dispatch(fetchDamGroupMembersByGroupNameThunk('Invalid Group'));
+    const badGroup = 'Invalid Group';
+    const encodedBadGroup = encodeURIComponent(badGroup);
+
+    await store.dispatch(fetchDamGroupMembersByGroupNameThunk(badGroup));
     const state = store.getState();
     expect(state.groupMembers).toEqual([]);
     expect(state.status).toBe('failed');
+
+    // Expect the encoded group name in the error string
     expect(state.error).toBe(
-      'Error fetching /api/dam_group_members/Invalid Group: 404 Error - {"message":"Not Found"}'
+      `Error fetching /api/dam_group_members/${encodedBadGroup}: 404 Error - {"message":"Not Found"}`
     );
   });
 });

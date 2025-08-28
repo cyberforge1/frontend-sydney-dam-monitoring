@@ -21,7 +21,7 @@ describe('damResourcesSlice', () => {
   };
 
   afterEach(() => {
-    jest.clearAllMocks(); // Clear fetch mock after each test
+    jest.clearAllMocks();
   });
 
   it('should handle initial state', () => {
@@ -47,7 +47,9 @@ describe('damResourcesSlice', () => {
     const state = store.getState();
     expect(state.latestData).toEqual(mockResponse);
     expect(state.status).toBe('succeeded');
-    expect(global.fetch).toHaveBeenCalledWith('/api/latest_data');
+
+    // fetch(url, undefined) in the API helper → assert second arg
+    expect(global.fetch).toHaveBeenCalledWith('/api/latest_data', undefined);
   });
 
   it('should handle fetchAllLatestDataThunk rejected', async () => {
@@ -65,16 +67,16 @@ describe('damResourcesSlice', () => {
 
   it('should handle fetchAllOverallDamAnalysesThunk fulfilled', async () => {
     const store = configureStore({ reducer });
-    const mockResponse = [
-      { analysisId: '1', analysisName: 'Analysis A' },
-    ];
+    const mockResponse = [{ analysisId: '1', analysisName: 'Analysis A' }];
     mockFetch(mockResponse);
 
     await store.dispatch(fetchAllOverallDamAnalysesThunk());
     const state = store.getState();
     expect(state.overallDamAnalysis).toEqual(mockResponse);
     expect(state.status).toBe('succeeded');
-    expect(global.fetch).toHaveBeenCalledWith('/api/overall_dam_analysis');
+
+    // fetch(url, undefined)
+    expect(global.fetch).toHaveBeenCalledWith('/api/overall_dam_analysis', undefined);
   });
 
   it('should handle fetchAllOverallDamAnalysesThunk rejected', async () => {
@@ -92,16 +94,16 @@ describe('damResourcesSlice', () => {
 
   it('should handle fetchSpecificDamAnalysisByIdThunk fulfilled', async () => {
     const store = configureStore({ reducer });
-    const mockResponse = [
-      { analysisId: '1', analysisName: 'Analysis A' },
-    ];
+    const mockResponse = [{ analysisId: '1', analysisName: 'Analysis A' }];
     mockFetch(mockResponse);
 
     await store.dispatch(fetchSpecificDamAnalysisByIdThunk('1'));
     const state = store.getState();
     expect(state.specificDamAnalyses).toEqual(mockResponse);
     expect(state.status).toBe('succeeded');
-    expect(global.fetch).toHaveBeenCalledWith('/api/specific_dam_analysis/1');
+
+    // fetch(url, undefined)
+    expect(global.fetch).toHaveBeenCalledWith('/api/specific_dam_analysis/1', undefined);
   });
 
   it('should handle fetchSpecificDamAnalysisByIdThunk rejected', async () => {

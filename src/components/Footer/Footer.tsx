@@ -9,7 +9,7 @@ const Footer: React.FC = () => {
     return (
         <div className="footer">
             <div className="footer-left">
-                <p>© {currentYear} Sydney Dam Monitoring</p>
+                <p>© {currentYear} Water Dashboard NSW</p>
             </div>
             <div className="footer-right">
                 <a href="https://api.nsw.gov.au/Product/Index/26" target="_blank" rel="noopener noreferrer">

@@ -9,65 +9,81 @@ import {
   OverallDamAnalysis,
 } from '../types/types';
 
-// Base API URL (useful if environment-specific or configurable)
-const API_BASE_URL = '/api';
+/**
+ * Resolve API base URL in this order:
+ * 1) process.env.VITE_API_BASE_URL or process.env.API_BASE_URL  (Node/Jest, SSR)
+ * 2) window.__API_BASE_URL__                                   (browser override for e2e/tests)
+ * 3) '/api'                                                    (dev fallback / proxy)
+ */
+const RAW_BASE =
+  (typeof process !== 'undefined' &&
+    (process.env?.VITE_API_BASE_URL || process.env?.API_BASE_URL)) ||
+  (typeof window !== 'undefined' && (window as any).__API_BASE_URL__) ||
+  '/api';
 
-// Utility function to fetch data
-const fetchData = async <T>(url: string): Promise<T> => {
-  const response = await fetch(url);
+const API_BASE = String(RAW_BASE).replace(/\/+$/, ''); // strip trailing slash(es)
+
+/** join base + path segments, ensuring single slashes */
+const url = (...parts: string[]) =>
+  `${API_BASE}/${parts.map(encodeURIComponent).join('/')}`.replace(
+    /([^:]\/)\/+/g,
+    '$1'
+  );
+
+/** minimal fetch wrapper with better error messages */
+const fetchData = async <T>(endpoint: string, init?: RequestInit): Promise<T> => {
+  const response = await fetch(endpoint, init);
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Error fetching ${url}: ${response.status} ${response.statusText} - ${errorText}`);
+    // try to surface response body for easier debugging
+    let body = '';
+    try {
+      body = await response.text();
+    } catch {
+      /* ignore */
+    }
+    throw new Error(
+      `Error fetching ${endpoint}: ${response.status} ${response.statusText}${
+        body ? ` - ${body}` : ''
+      }`
+    );
   }
-  return response.json();
+  return response.json() as Promise<T>;
 };
 
-// Fetch all dams
-export const fetchAllDams = async (): Promise<Dam[]> => {
-  return fetchData<Dam[]>(`${API_BASE_URL}/dams`);
-};
+// ---- Endpoints --------------------------------------------------------------
 
-// Fetch dam by ID
-export const fetchDamById = async (damId: string): Promise<Dam> => {
-  return fetchData<Dam>(`${API_BASE_URL}/dams/${damId}`);
-};
+export const fetchAllDams = (): Promise<Dam[]> =>
+  fetchData<Dam[]>(url('dams'));
 
-// Fetch all latest dam data
-export const fetchAllLatestData = async (): Promise<DamResource[]> => {
-  return fetchData<DamResource[]>(`${API_BASE_URL}/latest_data`);
-};
+export const fetchDamById = (damId: string): Promise<Dam> =>
+  fetchData<Dam>(url('dams', damId));
 
-// Fetch latest data by dam ID
-export const fetchLatestDataById = async (damId: string): Promise<DamResource> => {
-  return fetchData<DamResource>(`${API_BASE_URL}/latest_data/${damId}`);
-};
+export const fetchAllLatestData = (): Promise<DamResource[]> =>
+  fetchData<DamResource[]>(url('latest_data'));
 
-// Fetch specific dam analysis by dam ID
-export const fetchSpecificDamAnalysisById = async (damId: string): Promise<DamAnalysis[]> => {
-  return fetchData<DamAnalysis[]>(`${API_BASE_URL}/specific_dam_analysis/${damId}`);
-};
+export const fetchLatestDataById = (damId: string): Promise<DamResource> =>
+  fetchData<DamResource>(url('latest_data', damId));
 
-// Fetch all dam groups
-export const fetchAllDamGroups = async (): Promise<DamGroup[]> => {
-  return fetchData<DamGroup[]>(`${API_BASE_URL}/dam_groups`);
-};
+export const fetchSpecificDamAnalysisById = (
+  damId: string
+): Promise<DamAnalysis[]> =>
+  fetchData<DamAnalysis[]>(url('specific_dam_analysis', damId));
 
-// Fetch dam group by name
-export const fetchDamGroupByName = async (groupName: string): Promise<DamGroup> => {
-  return fetchData<DamGroup>(`${API_BASE_URL}/dam_groups/${groupName}`);
-};
+export const fetchAllDamGroups = (): Promise<DamGroup[]> =>
+  fetchData<DamGroup[]>(url('dam_groups'));
 
-// Fetch dam group members by group name
-export const fetchDamGroupMembersByGroupName = async (groupName: string): Promise<DamGroupMember[]> => {
-  return fetchData<DamGroupMember[]>(`${API_BASE_URL}/dam_group_members/${groupName}`);
-};
+export const fetchDamGroupByName = (groupName: string): Promise<DamGroup> =>
+  fetchData<DamGroup>(url('dam_groups', groupName));
 
-// Fetch all overall dam analyses
-export const fetchAllOverallDamAnalyses = async (): Promise<OverallDamAnalysis[]> => {
-  return fetchData<OverallDamAnalysis[]>(`${API_BASE_URL}/overall_dam_analysis`);
-};
+export const fetchDamGroupMembersByGroupName = (
+  groupName: string
+): Promise<DamGroupMember[]> =>
+  fetchData<DamGroupMember[]>(url('dam_group_members', groupName));
 
-// Fetch overall dam analysis by date
-export const fetchOverallDamAnalysisByDate = async (analysisDate: string): Promise<OverallDamAnalysis> => {
-  return fetchData<OverallDamAnalysis>(`${API_BASE_URL}/overall_dam_analysis/${analysisDate}`);
-};
+export const fetchAllOverallDamAnalyses = (): Promise<OverallDamAnalysis[]> =>
+  fetchData<OverallDamAnalysis[]>(url('overall_dam_analysis'));
+
+export const fetchOverallDamAnalysisByDate = (
+  analysisDate: string
+): Promise<OverallDamAnalysis> =>
+  fetchData<OverallDamAnalysis>(url('overall_dam_analysis', analysisDate));
