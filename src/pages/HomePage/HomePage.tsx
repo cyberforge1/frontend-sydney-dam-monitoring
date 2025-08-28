@@ -39,20 +39,26 @@ const HomePage: React.FC = () => {
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const lastFetchedGroupRef = useRef<string | null>(null);
 
+  // ---------------------------------------------------------------------------
   // Preload global caches ONCE (so cards render without extra fetches)
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (dams.length === 0) dispatch(fetchAllDamsThunk());
     if (latestData.length === 0) dispatch(fetchAllLatestDataThunk());
   }, [dispatch, dams.length, latestData.length]);
 
-  // Load list of groups ONCE
+  // ---------------------------------------------------------------------------
+  // Load list of groups ONCE (and retry if previous attempt failed)
+  // ---------------------------------------------------------------------------
   useEffect(() => {
-    if (groupsStatus === 'idle' && groups.length === 0) {
+    if (groups.length === 0 || groupsStatus === 'failed') {
       dispatch(fetchAllDamGroupsThunk());
     }
-  }, [dispatch, groupsStatus, groups.length]);
+  }, [dispatch, groups.length, groupsStatus]);
 
+  // ---------------------------------------------------------------------------
   // Resolve default group when groups arrive
+  // ---------------------------------------------------------------------------
   const defaultGroup = useMemo(() => {
     if (!groups.length) return null;
     return (
@@ -62,14 +68,18 @@ const HomePage: React.FC = () => {
     );
   }, [groups]);
 
+  // ---------------------------------------------------------------------------
   // Initialize selected group when default is known
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (!selectedGroup && defaultGroup) {
       setSelectedGroup(defaultGroup);
     }
   }, [defaultGroup, selectedGroup]);
 
+  // ---------------------------------------------------------------------------
   // Fetch members when selection changes (dedupe multiple identical requests)
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (!selectedGroup) return;
     if (lastFetchedGroupRef.current === selectedGroup) return;
@@ -102,18 +112,23 @@ const HomePage: React.FC = () => {
 
       <div className="top-dams-pie-charts-container">
         {loadingGroups && <div>Loading groups…</div>}
-        {groupsError && <div>Error: {groupsError}</div>}
 
-        {!groupsError && !loadingGroups && selectedGroup && loadingMembers && (
-          <div>Loading data for: {selectedGroup}…</div>
+        {groupsError && (
+          <div>
+            Error loading dam groups: {groupsError}{' '}
+            <button type="button" onClick={() => dispatch(fetchAllDamGroupsThunk())}>
+              Retry
+            </button>
+          </div>
         )}
 
-        {!groupsError &&
-          !loadingMembers &&
-          selectedGroup &&
-          groupMembers.length === 0 && (
-            <div>No data available for the selected group.</div>
-          )}
+        {!groupsError && !loadingGroups && groups.length === 0 && (
+          <div>No dam groups available.</div>
+        )}
+
+        {!groupsError && !loadingMembers && selectedGroup && groupMembers.length === 0 && (
+          <div>No data available for the selected group.</div>
+        )}
 
         {groupMembers.length > 0 && <TopDamsPieCharts damData={groupMembers} />}
       </div>

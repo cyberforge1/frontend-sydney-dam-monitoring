@@ -11,6 +11,7 @@ interface DamGroupSelectorProps {
 }
 
 const DamGroupSelector: React.FC<DamGroupSelectorProps> = ({ groups, value, onChange, disabled }) => {
+  if (disabled) return <div className="dam-group-selector">Loading groups…</div>;
   if (!groups.length) return <div className="dam-group-selector">No dam groups available</div>;
 
   return (

@@ -3,7 +3,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import HomePage from './pages/HomePage/HomePage';
-import SelectedDamPage from './pages/SelectedDamPage/SelectedDamPage'; // ⬅️ re-enabled
+// import SelectedDamPage from './pages/SelectedDamPage/SelectedDamPage'; // ⬅️ re-enabled
 import DamListPage from './pages/DamListPage/DamListPage';             // ⬅️ re-enabled
 // import PageTwo from './pages/PageTwo/PageTwo';
 // import PageThree from './pages/PageThree/PageThree';
@@ -46,7 +46,7 @@ const App: React.FC = () => {
           />
 
           {/* Dam List page */}
-          {/* <Route path="/damlist" element={<DamListPage />} /> */}
+          <Route path="/damlist" element={<DamListPage />} />
 
           {/* Selected Dam routes (deep-link + backward compatible) */}
           {/* <Route path="/dam/:damId" element={<SelectedDamPage />} />  */}

@@ -1,4 +1,4 @@
-// # src/components/OpenListOfDams/OpenListOfDams.tsx
+// src/components/OpenListOfDams/OpenListOfDams.tsx
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,6 @@ const OpenListOfDams: React.FC = () => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    console.log('Navigating to dam list...');
     navigate('/damlist');
   };
 

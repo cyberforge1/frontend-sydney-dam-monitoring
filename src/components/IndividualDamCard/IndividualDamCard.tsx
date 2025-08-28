@@ -1,6 +1,6 @@
 // src/components/IndividualDamCard/IndividualDamCard.tsx
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Pie } from 'react-chartjs-2';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -18,11 +18,20 @@ const IndividualDamCard: React.FC<IndividualDamCardProps> = ({ damId }) => {
   const navigate = useNavigate();
 
   // Read-only data: NO dispatches here (keeps the card pure)
-  const damName = useSelector((s: RootState) =>
-    s.dams.dams.find(d => d.dam_id === damId)?.dam_name
+  const damsSlice = useSelector((s: RootState) => s.dams.dams);
+  const latestSlice = useSelector((s: RootState) => s.damResources.latestData);
+
+  const damArray = Array.isArray(damsSlice) ? damsSlice : [];
+  const latestArray = Array.isArray(latestSlice) ? latestSlice : [];
+
+  const damName = useMemo(
+    () => damArray.find(d => d.dam_id === damId)?.dam_name,
+    [damArray, damId]
   );
-  const latest = useSelector((s: RootState) =>
-    s.damResources.latestData.find(d => d.dam_id === damId)
+
+  const latest = useMemo(
+    () => latestArray.find(d => d.dam_id === damId),
+    [latestArray, damId]
   );
 
   const loading = !damName || !latest || typeof latest.percentage_full !== 'number';
@@ -31,11 +40,12 @@ const IndividualDamCard: React.FC<IndividualDamCardProps> = ({ damId }) => {
     return <div>Loading…</div>;
   }
 
+  const pct = Number(latest.percentage_full);
   const pieData = {
     labels: ['Full', 'Empty'],
     datasets: [
       {
-        data: [Number(latest.percentage_full), 100 - Number(latest.percentage_full)],
+        data: [pct, Math.max(0, 100 - pct)],
         backgroundColor: ['#5274EA', '#E63C74'],
       },
     ],
@@ -56,7 +66,7 @@ const IndividualDamCard: React.FC<IndividualDamCardProps> = ({ damId }) => {
       <h2 onClick={handleDamNameClick} style={{ cursor: 'pointer', color: '#007bff' }}>
         {damName}
       </h2>
-      <p>Percentage Full: {latest.percentage_full}%</p>
+      <p>Percentage Full: {pct}%</p>
       <div className="pie-chart-container">
         <Pie data={pieData} options={pieOptions} />
       </div>
