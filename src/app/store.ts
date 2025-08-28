@@ -1,16 +1,13 @@
 // src/app/store.ts
 
 import { configureStore } from '@reduxjs/toolkit';
-import damsReducer from '../features/dams/damsSlice';
-import damResourcesReducer from '../features/damResources/damResourcesSlice';
-import damGroupsReducer from '../features/damGroups/damGroupsSlice';
+import { damsApi } from '../services/damsApi';
 
 export const store = configureStore({
   reducer: {
-    dams: damsReducer,
-    damResources: damResourcesReducer,
-    damGroups: damGroupsReducer,
+    [damsApi.reducerPath]: damsApi.reducer,
   },
+  middleware: (getDefault) => getDefault().concat(damsApi.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
