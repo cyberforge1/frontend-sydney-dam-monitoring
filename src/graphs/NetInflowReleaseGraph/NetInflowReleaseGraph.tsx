@@ -1,4 +1,4 @@
-// # src/graphs/NetInflowReleaseGraph/NetInflowReleaseGraph.tsx
+// src/graphs/NetInflowReleaseGraph/NetInflowReleaseGraph.tsx
 
 import React from 'react';
 import { Line } from 'react-chartjs-2';

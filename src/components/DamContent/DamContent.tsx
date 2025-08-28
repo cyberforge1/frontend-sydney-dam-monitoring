@@ -1,4 +1,4 @@
-// # src/components/DamContent/DamContent.tsx
+// src/components/DamContent/DamContent.tsx
 
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,11 +21,11 @@ const DamContent: React.FC<DamContentProps> = ({ damId, children }) => {
         }
     }, [dispatch, damId, selectedDam]);
 
-    if (status === 'loading') {
+    if (status === 'loading' && (!selectedDam || selectedDam.dam_id !== damId)) {
         return <div>Loading content...</div>;
     }
 
-    if (error) {
+    if (error && (!selectedDam || selectedDam.dam_id !== damId)) {
         return <div>Error loading content: {error}</div>;
     }
 

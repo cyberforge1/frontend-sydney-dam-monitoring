@@ -1,48 +1,92 @@
-// # src/graphs/DamCapacityGraph/DamCapacityGraph.tsx
+// src/graphs/DamCapacityGraph/DamCapacityGraph.tsx
 
-import React from 'react';
-import { Line } from 'react-chartjs-2';
-import { Chart, registerables } from 'chart.js';
-import './DamCapacityGraph.scss';
+import React, { useMemo } from 'react';
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from 'recharts';
 import { DamAnalysis } from '../../types/types';
 
-Chart.register(...registerables);
-
-interface DamCapacityGraphProps {
+interface Props {
   damName: string;
-  series: DamAnalysis[]; // analysis rows for THIS dam, sorted or unsorted
+  series: DamAnalysis[];
 }
 
-const DamCapacityGraph: React.FC<DamCapacityGraphProps> = ({ damName, series }) => {
-  if (!series || series.length === 0) {
-    return <div> No analysis available for {damName}.</div>;
+/**
+ * Capacity graph:
+ * - X axis: analysis_date (string)
+ * - Lines: avg_percentage_full_12_months and avg_storage_volume_12_months
+ *   (If 5y/20y are present across multiple dates, you can extend easily.)
+ *
+ * This component defensively handles:
+ * - Empty / invalid series
+ * - Records that may be missing one of the fields
+ */
+const DamCapacityGraph: React.FC<Props> = ({ damName, series }) => {
+  // --- Guard: empty or invalid input should not break the graph ---
+  const safe = Array.isArray(series) ? series : [];
+  const hasData = safe.length > 0;
+
+  const data = useMemo(() => {
+    if (!hasData) return [];
+    // Map to a shape Recharts understands; coerce undefined to null.
+    return safe.map((d) => ({
+      analysis_date: d.analysis_date,
+      avg_percentage_full_12_months:
+        typeof d.avg_percentage_full_12_months === 'number'
+          ? Number(d.avg_percentage_full_12_months)
+          : null,
+      avg_storage_volume_12_months:
+        typeof d.avg_storage_volume_12_months === 'number'
+          ? Number(d.avg_storage_volume_12_months)
+          : null,
+    }));
+  }, [safe, hasData]);
+
+  if (!hasData) {
+    return <div>No data to display.</div>;
   }
 
-  // Sort by date (ascending) so the line moves left→right over time
-  const sorted = [...series].sort(
-    (a, b) => new Date(a.analysis_date).getTime() - new Date(b.analysis_date).getTime()
-  );
-
-  const labels = sorted.map((d) => d.analysis_date);
-  const percentages = sorted.map((d) => d.avg_percentage_full_12_months ?? 0);
-
-  const chartData = {
-    labels,
-    datasets: [
-      {
-        label: 'Dam Capacity % (12 mo avg)',
-        data: percentages,
-        fill: false,
-        borderColor: 'rgb(75, 192, 192)',
-        tension: 0.1,
-      },
-    ],
-  };
-
   return (
-    <div className="dam-capacity-graph" style={{ textAlign: 'center' }}>
-      <h2>{damName} Capacity Percentage (12 mo avg)</h2>
-      <Line data={chartData} options={{ maintainAspectRatio: false }} />
+    <div aria-label={`Capacity graph for ${damName}`}>
+      <ResponsiveContainer width="100%" height={300}>
+        <LineChart data={data} margin={{ top: 8, right: 16, bottom: 8, left: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="analysis_date" />
+          <YAxis
+            yAxisId="left"
+            tickFormatter={(v) => `${v}%`}
+            // percentage axis
+          />
+          <YAxis
+            yAxisId="right"
+            orientation="right"
+            // storage volume axis
+          />
+          <Tooltip />
+          <Legend />
+          <Line
+            yAxisId="left"
+            type="monotone"
+            dataKey="avg_percentage_full_12_months"
+            name="% full (12m avg)"
+            dot
+          />
+          <Line
+            yAxisId="right"
+            type="monotone"
+            dataKey="avg_storage_volume_12_months"
+            name="Storage vol (12m avg)"
+            dot
+          />
+        </LineChart>
+      </ResponsiveContainer>
     </div>
   );
 };
