@@ -1,40 +1,64 @@
-// src/pages/AboutPage/AboutPage.scss
+/* src/pages/AboutPage/AboutPage.scss */
 .AboutPage {
   width: 100%;
   min-height: 100vh;
 
-  background: #8b5cf6;  /* purple */
-  color: #ffffff;
+  /* Local tokens (fallbacks if app-wide vars aren’t set) */
+  --fg: #e5f0ff;
+  --card-bg: rgba(255, 255, 255, 0.04);
+  --card-border: rgba(229, 240, 255, 0.12);
+  --elev: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --accent: #93c5fd;
+
+  background: var(--page-about);
+  color: var(--fg);
 
   display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  padding: 2rem;
+  padding: clamp(1rem, 3vw, 2rem);
+  text-align: left; /* ensure left alignment across the container */
 }
 
 @supports (height: 100dvh) {
   .AboutPage { min-height: 100dvh; }
 }
 
-/* Text box container */
+/* Container styled like the dashboard card */
 .text-box {
-  max-width: 800px;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  width: min(var(--container-max, 1200px), var(--container-inline, 94vw));
+  margin-inline: auto;
+
+  background: var(--card-bg);
+  outline: 1px solid var(--card-border);
+  outline-offset: -1px;
+  border-radius: 14px;
+  box-shadow: var(--elev);
+  padding: clamp(1rem, 2.6vw, 1.75rem);
+
+  /* subtle section divider just like the dashboard */
+  position: relative;
+}
+.text-box > * + * {
+  position: relative;
+}
+.text-box > * + *::before {
+  content: "";
+  display: block;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--card-border), transparent);
+  margin: 0.25rem 0 0.75rem 0;
 }
 
-/* Title */
-.text-box-title {
-  font-size: clamp(2rem, 4vw, 3rem);
+/* Title style to match the dashboard title */
+.page-title {
+  font-size: clamp(1.6rem, 3.5vw, 2.1rem);
   font-weight: 700;
-  margin-bottom: 1.5rem;
-  letter-spacing: 0.02em;
+  color: var(--accent);
+  margin-bottom: 0.1rem;
 }
 
-/* Paragraph list */
+/* Body copy */
 .text-box-list {
   list-style: none;
   padding: 0;
@@ -42,7 +66,7 @@
 }
 
 .text-box-list p {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.1rem;
   line-height: 1.6;
   font-size: 1.05rem;
 }

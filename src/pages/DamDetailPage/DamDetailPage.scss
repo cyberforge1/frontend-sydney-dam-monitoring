@@ -2,7 +2,7 @@
 .DamDetailPage {
   width: 100%;
   min-height: 100vh;
-  background: #f59e0b; /* amber */
+  background: var(--page-detail);
   color: #111827;      /* near-black for contrast */
 
   display: flex;

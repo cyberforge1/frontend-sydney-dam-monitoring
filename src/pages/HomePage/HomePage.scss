@@ -2,7 +2,7 @@
 .HomePage {
   width: 100%;
   min-height: 100vh;
-  background: #0ea5e9; /* sky blue */
+  background: var(--page-home);
   color: #ffffff;
 
   display: flex;
@@ -105,3 +105,4 @@
   background: #ffffff;
   color: #0ea5e9;
 }
+

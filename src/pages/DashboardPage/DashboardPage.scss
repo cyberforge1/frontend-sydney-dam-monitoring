@@ -7,7 +7,7 @@
   --card-bg: rgba(255, 255, 255, 0.04);
   --card-border: rgba(229, 240, 255, 0.12);
   --elev: 0 10px 30px rgba(0, 0, 0, 0.35);
-  --accent: #93c5fd; /* headings / highlights */
+  --accent: #93c5fd;
   --good: #86efac;
   --bad: #fca5a5;
 
@@ -26,7 +26,8 @@
 }
 
 .dashboard-box {
-  width: min(1200px, 94vw);
+  /* was: width: min(1200px, 94vw); */
+  width: min(var(--container-max), var(--container-inline));
   display: grid;
   gap: 1rem;
 
@@ -36,7 +37,7 @@
   border-radius: 14px;
   box-shadow: var(--elev);
   padding: clamp(1rem, 2.6vw, 1.75rem);
-  text-align: left; /* let inner content be left-aligned */
+  text-align: left;
 }
 
 .dashboard-box__title {
@@ -46,20 +47,9 @@
   margin-bottom: 0.1rem;
 }
 
-.dashboard-box__hint {
-  color: var(--muted);
-  font-size: 0.98rem;
-  margin-bottom: 0.25rem;
-}
-
-/* optional subtle divider before big sections */
-.dashboard-box > * + * {
-  position: relative;
-}
+.dashboard-box > * + * { position: relative; }
 .dashboard-box > * + *::before {
-  content: "";
-  display: block;
-  height: 1px;
+  content: ""; display: block; height: 1px;
   background: linear-gradient(90deg, transparent, var(--card-border), transparent);
   margin: 0.25rem 0 0.75rem 0;
 }

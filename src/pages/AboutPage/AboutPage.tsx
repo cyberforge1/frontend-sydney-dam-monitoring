@@ -6,7 +6,7 @@ const AboutPage: React.FC = () => {
   return (
     <div className="AboutPage">
       <div className="text-box">
-        <h1 className="text-box-title">About Page</h1>
+        <h1 className="page-title">About Page</h1>
         <ul className="text-box-list">
           <p>
             🌊 Since ancient times, civilizations have relied on dams, which remain vital today for ensuring a stable water supply, generating hydroelectric power, and mitigating flood risks. Additionally, dams support environmental conservation by creating wetlands and improving water quality.
