@@ -3,62 +3,41 @@
   width: 100%;
   min-height: 100vh;
 
-  /* Local tokens (fallbacks if app-wide vars aren’t set) */
-  --fg: #e5f0ff;
-  --card-bg: rgba(255, 255, 255, 0.04);
-  --card-border: rgba(229, 240, 255, 0.12);
-  --elev: 0 10px 30px rgba(0, 0, 0, 0.35);
-  --accent: #93c5fd;
+  /* theme-aware colors */
+  background: var(--page-about, #8b5cf6);
+  color: var(--fg, #ffffff);
 
-  background: var(--page-about);
-  color: var(--fg);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: clamp(1rem, 3vw, 2rem);
-  text-align: left; /* ensure left alignment across the container */
+  /* 2 rows: main (fills) + footer (auto) */
+  display: grid;
+  grid-template-rows: 1fr auto;
 }
 
 @supports (height: 100dvh) {
   .AboutPage { min-height: 100dvh; }
 }
 
-/* Container styled like the dashboard card */
+/* Center the container inside the main area */
+.AboutPage__main {
+  display: grid;
+  place-items: center; /* centers horizontally & vertically */
+  padding: clamp(1rem, 3vw, 2rem);
+}
+
+/* Card container (matches dashboard look) */
 .text-box {
   width: min(var(--container-max, 1200px), var(--container-inline, 94vw));
   margin-inline: auto;
 
-  background: var(--card-bg);
-  outline: 1px solid var(--card-border);
+  background: var(--card-bg, rgba(255,255,255,0.1));
+  outline: 1px solid var(--card-border, rgba(229,240,255,0.12));
   outline-offset: -1px;
   border-radius: 14px;
-  box-shadow: var(--elev);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   padding: clamp(1rem, 2.6vw, 1.75rem);
-
-  /* subtle section divider just like the dashboard */
-  position: relative;
-}
-.text-box > * + * {
-  position: relative;
-}
-.text-box > * + *::before {
-  content: "";
-  display: block;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--card-border), transparent);
-  margin: 0.25rem 0 0.75rem 0;
 }
 
-/* Title style to match the dashboard title */
-.page-title {
-  font-size: clamp(1.6rem, 3.5vw, 2.1rem);
-  font-weight: 700;
-  color: var(--accent);
-  margin-bottom: 0.1rem;
-}
+/* Title uses shared .page-title */
 
-/* Body copy */
 .text-box-list {
   list-style: none;
   padding: 0;
