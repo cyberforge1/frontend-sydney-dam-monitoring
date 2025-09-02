@@ -1,46 +1,65 @@
 // src/pages/HomePage/HomePage.scss
 
 .HomePage {
-  width: 100vw;
-  height: 100vh;        /* exact viewport height */
-  overflow: hidden;     /* never scroll the page */
+  width: 100%;
+  min-height: 100vh;  /* fallback */
+  background: #0ea5e9; /* sky blue */
+  color: #ffffff;
 
   display: flex;
-  flex-direction: column;
   align-items: center;
-  padding: 2rem 1rem;
-  box-sizing: border-box;
-}
-
-header {
-  margin-bottom: 1.5rem;
+  justify-content: center;
   text-align: center;
 }
 
-.subtitle {
-  margin-top: 0.25rem;
-  color: #666;
+@supports (height: 100dvh) {
+  .HomePage { min-height: 100dvh; } /* dynamic viewport height */
 }
 
-.card {
-  background: #fff;
-  border: 1px solid #eee;
+.home-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.HomePage h1 {
+  font-size: clamp(2rem, 4vw, 4rem);
+  letter-spacing: 0.02em;
+}
+
+.cta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Button styles */
+.btn {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+
+  padding: 0.75rem 1.25rem;
   border-radius: 12px;
-  padding: 1rem 1.25rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  font-weight: 600;
 
-  /* keep cards within viewport; scroll inside if needed */
-  max-height: 30vh;
-  overflow: auto;
+  background: #ffffff;
+  color: #0ea5e9;
 
-  width: 100%;
-  max-width: 800px;
+  transition: transform 0.08s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
-ul { list-style: none; padding: 0; margin: 0; }
-li { padding: 0.35rem 0; }
-.name { font-weight: 600; }
-.muted { color: #666; }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); opacity: 0.95; }
+.btn:focus-visible {
+  outline: 3px solid rgba(255,255,255,0.9);
+  outline-offset: 2px;
+}
 
-.loading, .error { margin: 2rem 0; }
+.btn.btn-secondary {
+  background: #111827; /* near-black */
+  color: #ffffff;
+}

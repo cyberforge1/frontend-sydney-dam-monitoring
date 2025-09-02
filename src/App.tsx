@@ -13,14 +13,28 @@ import './App.scss';
 const App: React.FC = () => {
   return (
     <Provider store={store}>
-      <Router>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/dams" element={<DamListPage />} />
-          <Route path="/dams/:damId" element={<DamDetailPage />} />
-          <Route path="/about" element={<AboutPage />} />
-        </Routes>
-      </Router>
+      <div className="App">
+        <Router>
+          <Routes>
+            {/* Root: show HomePage, then AboutPage directly underneath */}
+            <Route
+              path="/"
+              element={
+                <>
+                  <HomePage />
+                  <AboutPage />
+                </>
+              }
+            />
+
+            {/* Other routes remain the same */}
+            <Route path="/dams" element={<DamListPage />} />
+            <Route path="/dams/:damId" element={<DamDetailPage />} />
+            {/* Keep a standalone About page if you want direct navigation */}
+            <Route path="/about" element={<AboutPage />} />
+          </Routes>
+        </Router>
+      </div>
     </Provider>
   );
 };

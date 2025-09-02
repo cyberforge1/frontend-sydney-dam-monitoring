@@ -1,24 +1,55 @@
 // src/pages/DamDetailPage/DamDetailPage.scss
 
 .DamDetailPage {
-  width: 100vw;
-  height: 100vh;        /* exact viewport height */
-  overflow: hidden;     /* never scroll the page */
+  width: 100%;
+  min-height: 100vh;
+
+  background: #f59e0b;  /* amber */
+  color: #111827;       /* near-black for contrast */
 
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   text-align: center;
+}
 
-  .content {
-    max-height: 80vh;
-    overflow: auto;
-    padding: 1rem;
-    width: min(900px, 90vw);
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-  }
+@supports (height: 100dvh) {
+  .DamDetailPage { min-height: 100dvh; }
+}
+
+.DamDetailPage h1 {
+  font-size: clamp(2rem, 4vw, 4rem);
+  letter-spacing: 0.02em;
+}
+
+/* Top-left home button */
+.home-btn {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+
+  padding: 0.55rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  background: rgba(255, 255, 255, 0.95);
+  color: #111827;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+
+  transition: transform 0.08s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+}
+
+.home-btn:hover   { transform: translateY(-1px); }
+.home-btn:active  { transform: translateY(0); opacity: 0.95; }
+.home-btn:focus-visible {
+  outline: 2px solid #111827;
+  outline-offset: 2px;
 }

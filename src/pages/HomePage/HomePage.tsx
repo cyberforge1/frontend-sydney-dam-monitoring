@@ -1,48 +1,39 @@
 // src/pages/HomePage/HomePage.tsx
 
 import React from 'react';
-import {
-  useGetAllDamsQuery,
-  useGetAllLatestDataQuery,
-  useGetAllDamGroupsQuery,
-} from '../../services/damsApi';
+import { useNavigate } from 'react-router-dom';
 import './HomePage.scss';
 
+const DEFAULT_DAM_ID = '203042'; // change this to any valid dam_id you like
+
 const HomePage: React.FC = () => {
-  const { data: dams, isLoading: loadingDams, error: damsError } = useGetAllDamsQuery();
-  const { data: latest, isLoading: loadingLatest, error: latestError } = useGetAllLatestDataQuery();
-  const { data: groups, isLoading: loadingGroups, error: groupsError } = useGetAllDamGroupsQuery();
-
-  if (loadingDams || loadingLatest || loadingGroups) {
-    return <div className="loading">Loading…</div>;
-  }
-
-  const anyError = (damsError ?? latestError ?? groupsError) as any;
-  if (anyError) {
-    return <div className="error">Failed to load: {anyError?.error ?? 'Unknown error'}</div>;
-  }
+  const navigate = useNavigate();
 
   return (
     <div className="HomePage">
-      <header>
-        <h1>NSW Water Dashboard</h1>
-        <p className="subtitle">Status check for API endpoints</p>
-      </header>
+      <div className="home-content">
+        <h1>Home Page</h1>
 
-      <section className="card">
-        <h2>Endpoints</h2>
-        <ul>
-          <li>
-            ✅ Dams loaded ({dams?.length ?? 0} records)
-          </li>
-          <li>
-            ✅ Latest data loaded ({latest?.length ?? 0} records)
-          </li>
-          <li>
-            ✅ Groups loaded ({groups?.length ?? 0} records)
-          </li>
-        </ul>
-      </section>
+        <div className="cta">
+          <button
+            type="button"
+            className="btn"
+            onClick={() => navigate('/dams')}
+            aria-label="Go to Dam List"
+          >
+            View Dam List
+          </button>
+
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => navigate(`/dams/${DEFAULT_DAM_ID}`)}
+            aria-label={`Go to Dam Detail for ${DEFAULT_DAM_ID}`}
+          >
+            View Example Dam ({DEFAULT_DAM_ID})
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

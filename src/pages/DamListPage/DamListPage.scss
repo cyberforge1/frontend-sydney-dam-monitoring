@@ -1,19 +1,55 @@
 // src/pages/DamListPage/DamListPage.scss
 
 .DamListPage {
-  width: 100vw;
-  height: 100vh;        /* exact viewport height */
-  overflow: hidden;     /* never scroll the page */
+  width: 100%;
+  min-height: 100vh;
+
+  background: #22c55e;  /* green */
+  color: #ffffff;
 
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   text-align: center;
+}
 
-  /* if you add content later, wrap it in .content to allow internal scroll */
-  .content {
-    max-height: 80vh;
-    overflow: auto;
-    padding: 1rem;
-  }
+@supports (height: 100dvh) {
+  .DamListPage { min-height: 100dvh; }
+}
+
+.DamListPage h1 {
+  font-size: clamp(2rem, 4vw, 4rem);
+  letter-spacing: 0.02em;
+}
+
+/* Top-left home button */
+.home-btn {
+  position: fixed;       /* pin to viewport */
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+
+  padding: 0.55rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  background: rgba(255, 255, 255, 0.95);
+  color: #111827; /* near-black for contrast */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+
+  transition: transform 0.08s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+}
+
+.home-btn:hover   { transform: translateY(-1px); }
+.home-btn:active  { transform: translateY(0); opacity: 0.95; }
+.home-btn:focus-visible {
+  outline: 2px solid #111827;
+  outline-offset: 2px;
 }
