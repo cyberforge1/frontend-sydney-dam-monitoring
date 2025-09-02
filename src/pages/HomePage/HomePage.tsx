@@ -1,5 +1,4 @@
 // src/pages/HomePage/HomePage.tsx
-
 import React from 'react';
 import {
   useGetAllDamsQuery,
@@ -32,7 +31,7 @@ const HomePage: React.FC = () => {
       <section className="card">
         <h2>Dams ({dams?.length ?? 0})</h2>
         <ul>
-          {dams?.slice(0, 10).map((d) => (
+          {dams?.map((d) => (
             <li key={d.dam_id}>
               <span className="name">{d.dam_name}</span>
               <span className="muted"> ({d.dam_id})</span>
@@ -44,10 +43,13 @@ const HomePage: React.FC = () => {
       <section className="card">
         <h2>Latest data ({latest?.length ?? 0})</h2>
         <ul>
-          {latest?.slice(0, 10).map((r) => (
+          {latest?.map((r) => (
             <li key={r.dam_id}>
               <span className="name">{r.dam_id}</span>
-              <span className="muted"> — {r.percentage_full}% on {r.date}</span>
+              <span className="muted">
+                {' '}
+                — {r.percentage_full ?? '—'}% on {r.date}
+              </span>
             </li>
           ))}
         </ul>
