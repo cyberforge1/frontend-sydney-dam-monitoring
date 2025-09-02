@@ -1,5 +1,5 @@
 // src/pages/DamListPage/DamListPage.tsx
-import React, { useMemo, useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useGetAllDamsQuery } from '../../services/damsApi';
 import './DamListPage.scss';
@@ -7,19 +7,8 @@ import './DamListPage.scss';
 const DamListPage: React.FC = () => {
   const navigate = useNavigate();
   const { data, isLoading, isError, refetch } = useGetAllDamsQuery();
-  const [query, setQuery] = useState('');
 
   const dams = data ?? [];
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return dams;
-    return dams.filter((d) => {
-      const name = (d.dam_name ?? '').toLowerCase();
-      const id = (d.dam_id ?? '').toLowerCase();
-      return name.includes(q) || id.includes(q);
-    });
-  }, [dams, query]);
 
   return (
     <div className="DamListPage">
@@ -29,23 +18,10 @@ const DamListPage: React.FC = () => {
 
       <div className="list-wrapper" role="region" aria-label="Dam list">
         <h1 className="list-title">Select a Dam</h1>
+        <p className="list-meta" aria-live="polite">
+          {isLoading ? 'Loading…' : `${dams.length} dam${dams.length === 1 ? '' : 's'}`}
+        </p>
 
-        {/* Search/filter */}
-        <div className="list-controls">
-          <input
-            className="list-search"
-            type="text"
-            placeholder="Filter by name or ID…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            aria-label="Filter dams by name or ID"
-          />
-          <span className="result-count" aria-live="polite">
-            {isLoading ? 'Loading…' : `${filtered.length} result${filtered.length === 1 ? '' : 's'}`}
-          </span>
-        </div>
-
-        {/* States */}
         {isLoading && <div className="state">Loading dams…</div>}
 
         {isError && (
@@ -57,10 +33,9 @@ const DamListPage: React.FC = () => {
           </div>
         )}
 
-        {/* List */}
         {!isLoading && !isError && (
           <ul className="dam-list">
-            {filtered.map((d) => (
+            {dams.map((d) => (
               <li key={d.dam_id}>
                 <button
                   type="button"

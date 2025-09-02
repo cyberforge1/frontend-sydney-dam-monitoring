@@ -1,0 +1,105 @@
+/* src/components/SearchBar/SearchBar.scss */
+.SearchBar {
+    position: relative;          /* anchor the dropdown */
+    display: flex;
+    gap: 0.5rem;
+  
+    /* Fits nicely next to the "View Dam List" button */
+    flex: 1 1 420px;
+    max-width: 650px;
+  
+    /* Make all text inside the component left-aligned */
+    text-align: left;
+  }
+  
+  .SearchBar input {
+    flex: 1;
+    padding: 0.65rem 1rem;
+    border-radius: 10px;
+    border: none;
+    font-size: 1rem;
+  
+    /* Explicitly left-align input text */
+    text-align: left;
+  }
+  
+  .SearchBar button {
+    padding: 0.65rem 1.2rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600; /* keep button bold; change to 400 if you want non-bold */
+    background: #ffffff;
+    color: #0ea5e9;
+    cursor: pointer;
+    transition: transform 0.08s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  }
+  .SearchBar button:hover { transform: translateY(-1px); }
+  .SearchBar button:active { transform: translateY(0); opacity: 0.95; }
+  .SearchBar button:focus-visible {
+    outline: 3px solid rgba(14,165,233,0.35);
+    outline-offset: 2px;
+  }
+  
+  /* Dropdown */
+  .SearchBar__dropdown {
+    position: absolute;
+    top: calc(100% + 0.35rem);
+    left: 0;
+    right: 0;
+    z-index: 30;
+  
+    max-height: 280px;
+    overflow: auto;
+  
+    list-style: none;
+    margin: 0;
+    padding: 0.35rem;
+  
+    background: #fff;
+    border: 1px solid rgba(17, 24, 39, 0.15);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  
+    /* Ensure dropdown text is left-aligned */
+    text-align: left;
+  }
+  
+  .SearchBar__option {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+    align-items: center;
+  
+    padding: 0.5rem 0.6rem;
+    border-radius: 8px;
+    cursor: pointer;
+  
+    transition: background 0.12s ease;
+  
+    /* Left-align each option’s content */
+    text-align: left;
+  }
+  
+  /* Make suggestion text non-bold */
+  .SearchBar__option .name {
+    font-weight: 400;           /* was 600 */
+    color: #111827;
+  }
+  
+  .SearchBar__option .id {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-weight: 400;           /* ensure normal weight */
+    opacity: 0.75;
+  }
+  
+  .SearchBar__option:hover,
+  .SearchBar__option.is-active {
+    background: #f3f4f6;
+  }
+  
+  .SearchBar__option.is-muted {
+    color: #6b7280;
+    cursor: default;
+  }
+  

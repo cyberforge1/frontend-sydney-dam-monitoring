@@ -1,47 +1,65 @@
-// src/pages/DashboardPage/DashboardPage.scss
+/* src/pages/DashboardPage/DashboardPage.scss */
 .DashboardPage {
-  /* fill the viewport exactly */
+  /* page tokens (cascade to children) */
+  --bg: #0b1220;
+  --fg: #e5f0ff;
+  --muted: rgba(229, 240, 255, 0.7);
+  --card-bg: rgba(255, 255, 255, 0.04);
+  --card-border: rgba(229, 240, 255, 0.12);
+  --elev: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --accent: #93c5fd; /* headings / highlights */
+  --good: #86efac;
+  --bad: #fca5a5;
+
   width: 100%;
-  min-height: 100svh;              /* safer on mobile */
+  min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #0b1220;
-  color: #e5f0ff;
+  background: var(--bg);
+  color: var(--fg);
   text-align: center;
-  /* no padding here */
 }
 
 @supports (height: 100dvh) {
-  .DashboardPage { min-height: 100dvh; }  /* dynamic viewport height */
+  .DashboardPage { min-height: 100dvh; }
 }
 
-/* Centered flexible container box */
 .dashboard-box {
-  width: min(1100px, 92vw);
-  min-height: 420px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  width: min(1200px, 94vw);
+  display: grid;
+  gap: 1rem;
 
-  background: rgba(255, 255, 255, 0.04);
-  outline: 2px solid rgba(255, 255, 255, 0.25);
-  outline-offset: -2px;
+  background: var(--card-bg);
+  outline: 1px solid var(--card-border);
+  outline-offset: -1px;
   border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-
-  padding: clamp(1rem, 3vw, 2rem);  /* padding lives inside the box */
-  gap: 0.75rem;
+  box-shadow: var(--elev);
+  padding: clamp(1rem, 2.6vw, 1.75rem);
+  text-align: left; /* let inner content be left-aligned */
 }
 
 .dashboard-box__title {
-  font-size: clamp(1.6rem, 3.5vw, 2.2rem);
-  font-weight: 600;
-  margin-bottom: 0.25rem;
+  font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.1rem;
 }
 
 .dashboard-box__hint {
-  opacity: 0.9;
+  color: var(--muted);
   font-size: 0.98rem;
+  margin-bottom: 0.25rem;
+}
+
+/* optional subtle divider before big sections */
+.dashboard-box > * + * {
+  position: relative;
+}
+.dashboard-box > * + *::before {
+  content: "";
+  display: block;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--card-border), transparent);
+  margin: 0.25rem 0 0.75rem 0;
 }

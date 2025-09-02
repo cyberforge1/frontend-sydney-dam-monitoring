@@ -1,6 +1,7 @@
 // src/pages/DashboardPage/DashboardPage.tsx
 import React from 'react';
 import './DashboardPage.scss';
+import DamGroupGrid from '../../components/DamGroupGrid/DamGroupGrid';
 
 const DashboardPage: React.FC = () => {
   return (
@@ -10,11 +11,10 @@ const DashboardPage: React.FC = () => {
         role="region"
         aria-label="Dashboard content container"
       >
-        {/* Add future components here */}
-        <h2 className="dashboard-box__title">Dashboard</h2>
-        <p className="dashboard-box__hint">
-          Flexible container ready for charts, filters, and cards.
-        </p>
+        <h2 className="dashboard-box__title">Status Board</h2>
+
+        {/* Group-of-8 dam gauges with a group selector */}
+        <DamGroupGrid />
       </section>
     </div>
   );

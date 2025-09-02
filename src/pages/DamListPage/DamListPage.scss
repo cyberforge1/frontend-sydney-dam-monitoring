@@ -1,8 +1,8 @@
-// src/pages/DamListPage/DamListPage.scss
+/* src/pages/DamListPage/DamListPage.scss */
 .DamListPage {
   width: 100%;
   min-height: 100vh;
-  background: #22c55e;  /* green */
+  background: #22c55e;
   color: #111827;
 
   display: flex;
@@ -17,7 +17,6 @@
   .DamListPage { min-height: 100dvh; }
 }
 
-/* Top-left home button (already in your file) */
 .home-btn {
   position: fixed;
   top: 16px;
@@ -43,7 +42,6 @@
 .home-btn:hover { transform: translateY(-1px); }
 .home-btn:active { transform: translateY(0); opacity: 0.95; }
 
-/* Centered card */
 .list-wrapper {
   width: min(1000px, 92vw);
   max-height: min(72vh, 800px);
@@ -64,25 +62,8 @@
   color: #111827;
 }
 
-/* Controls */
-.list-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.list-search {
-  flex: 1 1 420px;
-  max-width: 560px;
-  padding: 0.65rem 0.9rem;
-  border-radius: 10px;
-  border: 1px solid rgba(17, 24, 39, 0.2);
-  font-size: 1rem;
-}
-
-.result-count {
+/* New small meta line (replaces search/controls) */
+.list-meta {
   font-size: 0.95rem;
   opacity: 0.8;
 }
