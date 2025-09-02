@@ -1,5 +1,10 @@
 # Commands.md
 
+# Scripts
+
+node smoke_api.js
+
+
 
 # Tests
 
