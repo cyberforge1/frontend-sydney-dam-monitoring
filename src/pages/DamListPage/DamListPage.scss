@@ -1,15 +1,15 @@
 // src/pages/DamListPage/DamListPage.scss
-
 .DamListPage {
   width: 100%;
   min-height: 100vh;
-
   background: #22c55e;  /* green */
-  color: #ffffff;
+  color: #111827;
 
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 2rem;
+  position: relative;
   text-align: center;
 }
 
@@ -17,14 +17,9 @@
   .DamListPage { min-height: 100dvh; }
 }
 
-.DamListPage h1 {
-  font-size: clamp(2rem, 4vw, 4rem);
-  letter-spacing: 0.02em;
-}
-
-/* Top-left home button */
+/* Top-left home button (already in your file) */
 .home-btn {
-  position: fixed;       /* pin to viewport */
+  position: fixed;
   top: 16px;
   left: 16px;
   z-index: 10;
@@ -41,15 +36,102 @@
   border-radius: 10px;
   border: 1px solid rgba(17, 24, 39, 0.12);
   background: rgba(255, 255, 255, 0.95);
-  color: #111827; /* near-black for contrast */
+  color: #111827;
   box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-
   transition: transform 0.08s ease, box-shadow 0.12s ease, opacity 0.12s ease;
 }
+.home-btn:hover { transform: translateY(-1px); }
+.home-btn:active { transform: translateY(0); opacity: 0.95; }
 
-.home-btn:hover   { transform: translateY(-1px); }
-.home-btn:active  { transform: translateY(0); opacity: 0.95; }
-.home-btn:focus-visible {
-  outline: 2px solid #111827;
-  outline-offset: 2px;
+/* Centered card */
+.list-wrapper {
+  width: min(1000px, 92vw);
+  max-height: min(72vh, 800px);
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(17, 24, 39, 0.12);
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
+
+.list-title {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: #111827;
+}
+
+/* Controls */
+.list-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.list-search {
+  flex: 1 1 420px;
+  max-width: 560px;
+  padding: 0.65rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid rgba(17, 24, 39, 0.2);
+  font-size: 1rem;
+}
+
+.result-count {
+  font-size: 0.95rem;
+  opacity: 0.8;
+}
+
+/* States */
+.state {
+  padding: 1rem 0.5rem;
+  color: #111827;
+}
+
+/* List */
+.dam-list {
+  list-style: none;
+  margin: 0.25rem 0 0;
+  padding: 0;
+
+  overflow: auto;
+  border-radius: 10px;
+  background: #ffffff;
+  max-height: 100%;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+}
+
+/* Row button */
+.dam-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+
+  text-align: left;
+  padding: 0.85rem 1rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+
+  transition: background 0.12s ease, transform 0.06s ease;
+}
+.dam-row:hover { background: #f3f4f6; }
+.dam-row:active { transform: translateY(0.5px); }
+
+.dam-name { font-weight: 600; color: #111827; }
+.dam-id   { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; opacity: 0.8; }
+
+.btn.btn-retry {
+  padding: 0.55rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid rgba(17,24,39,0.2);
+  background: #fff;
+  cursor: pointer;
+}
+.btn.btn-retry:hover { background: #f9fafb; }

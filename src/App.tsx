@@ -1,10 +1,10 @@
 // src/App.tsx
-
 import React from 'react';
 import { Provider } from 'react-redux';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { store } from './app/store';
 import HomePage from './pages/HomePage/HomePage';
+import DashboardPage from './pages/DashboardPage/DashboardPage';
 import DamListPage from './pages/DamListPage/DamListPage';
 import DamDetailPage from './pages/DamDetailPage/DamDetailPage';
 import AboutPage from './pages/AboutPage/AboutPage';
@@ -16,21 +16,22 @@ const App: React.FC = () => {
       <div className="App">
         <Router>
           <Routes>
-            {/* Root: show HomePage, then AboutPage directly underneath */}
+            {/* Root: Home -> Dashboard -> About (stacked) */}
             <Route
               path="/"
               element={
                 <>
                   <HomePage />
+                  <DashboardPage />
                   <AboutPage />
                 </>
               }
             />
 
-            {/* Other routes remain the same */}
+            {/* Standalone routes */}
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/dams" element={<DamListPage />} />
             <Route path="/dams/:damId" element={<DamDetailPage />} />
-            {/* Keep a standalone About page if you want direct navigation */}
             <Route path="/about" element={<AboutPage />} />
           </Routes>
         </Router>

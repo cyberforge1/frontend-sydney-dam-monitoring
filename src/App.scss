@@ -16,7 +16,8 @@ html, body, #root, .App {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100vh;
+  /* height: 100vh;  <-- remove this hard cap */
+  min-height: 100vh;   /* allow stacked sections to occupy full height */
   position: relative;
   overflow-y: auto;
 }

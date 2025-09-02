@@ -1,36 +1,49 @@
 // src/pages/HomePage/HomePage.tsx
-
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './HomePage.scss';
 
-const DEFAULT_DAM_ID = '203042'; // change this to any valid dam_id you like
-
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
+  const [search, setSearch] = useState('');
+
+  const handleSearch = () => {
+    if (search.trim()) {
+      navigate(`/dams/${encodeURIComponent(search.trim())}`);
+    }
+  };
 
   return (
     <div className="HomePage">
       <div className="home-content">
-        <h1>Home Page</h1>
+        {/* Title section */}
+        <h1 className="homepage-title">Water Dashboard NSW</h1>
+        <p className="homepage-subtitle">
+          This website provides recent and historical data on dams across NSW, Australia
+        </p>
 
-        <div className="cta">
+        {/* Search bar + View Dam List button */}
+        <div className="search-row">
+          <div className="search-bar">
+            <input
+              type="text"
+              placeholder="Search for a Dam..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              aria-label="Search for a Dam"
+            />
+            <button type="button" onClick={handleSearch}>
+              Search
+            </button>
+          </div>
+
           <button
             type="button"
-            className="btn"
+            className="btn btn-primary"
             onClick={() => navigate('/dams')}
             aria-label="Go to Dam List"
           >
             View Dam List
-          </button>
-
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={() => navigate(`/dams/${DEFAULT_DAM_ID}`)}
-            aria-label={`Go to Dam Detail for ${DEFAULT_DAM_ID}`}
-          >
-            View Example Dam ({DEFAULT_DAM_ID})
           </button>
         </div>
       </div>

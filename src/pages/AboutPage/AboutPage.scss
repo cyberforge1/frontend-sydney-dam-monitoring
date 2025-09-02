@@ -1,5 +1,4 @@
 // src/pages/AboutPage/AboutPage.scss
-
 .AboutPage {
   width: 100%;
   min-height: 100vh;
@@ -11,13 +10,39 @@
   align-items: center;
   justify-content: center;
   text-align: center;
+  padding: 2rem;
 }
 
 @supports (height: 100dvh) {
   .AboutPage { min-height: 100dvh; }
 }
 
-.AboutPage h1 {
-  font-size: clamp(2rem, 4vw, 4rem);
+/* Text box container */
+.text-box {
+  max-width: 800px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Title */
+.text-box-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  margin-bottom: 1.5rem;
   letter-spacing: 0.02em;
+}
+
+/* Paragraph list */
+.text-box-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.text-box-list p {
+  margin-bottom: 1.25rem;
+  line-height: 1.6;
+  font-size: 1.05rem;
 }
