@@ -1,58 +1,36 @@
 /* src/components/Footer/Footer.scss */
 .Footer {
-    position: static;     /* was: sticky */
-    bottom: auto;         /* was: 0 */
-    width: 100%;
-    background: var(--card-bg);
-    border-top: 1px solid var(--card-border);
-    color: var(--fg);
-    backdrop-filter: saturate(120%) blur(4px);
-    padding-block: 0.6rem;
-  }
-  
-  /* keep the rest of the rules as-is */
-  
-  
-  .Footer__inner {
-    width: min(var(--container-max, 1200px), var(--container-inline, 94vw));
-    margin-inline: auto;
-  
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding-inline: 0.75rem;
-  }
-  
-  .Footer__left {
-    font-size: 0.9rem;
-    opacity: 0.9;
-  }
-  
-  .Footer__right {
-    display: inline-flex;
-    gap: 0.8rem;
-  }
-  
-  .Footer__right a {
-    display: inline-grid;
-    place-items: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    color: var(--fg);
-    background: rgba(255,255,255,0.06);
-    border: 1px solid var(--card-border);
-    transition: transform 0.08s ease, background 0.12s ease, border-color 0.12s ease;
-  }
-  
-  .Footer__right a:hover {
-    transform: translateY(-1px);
-    background: rgba(255,255,255,0.1);
-    border-color: rgba(147, 197, 253, 0.35); /* accent hint */
-  }
-  
-  .Footer__right svg {
-    display: block;
-  }
-  
+  position: static;
+  width: 100%;
+  background: var(--card-bg);
+  border-top: 1px solid var(--card-border);
+  color: var(--fg);
+  padding-block: 0.6rem;
+}
+
+.Footer__inner {
+  width: min(var(--container-max, 1200px), var(--container-inline, 94vw));
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-inline: 0.75rem;
+}
+
+.Footer__left { font-size: 0.9rem; opacity: 0.9; }
+
+.Footer__right { display: inline-flex; gap: 0.8rem; }
+
+.Footer__right a {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  color: var(--fg);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--card-border);
+}
+
+.Footer__right svg { display: block; }

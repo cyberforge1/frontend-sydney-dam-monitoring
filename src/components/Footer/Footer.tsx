@@ -9,7 +9,7 @@ const Footer: React.FC = () => {
     <footer className="Footer" role="contentinfo">
       <div className="Footer__inner">
         <div className="Footer__left">
-          <p>© {currentYear} Sydney Dam Monitoring</p>
+          <p>© {currentYear} Water Dashboard NSW</p>
         </div>
 
         <nav className="Footer__right" aria-label="External links">

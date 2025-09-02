@@ -1,10 +1,6 @@
 /* src/App.scss */
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 html, body, #root, .App {
   width: 100%;
@@ -16,80 +12,43 @@ html, body, #root, .App {
   display: flex;
   flex-direction: column;
   width: 100%;
-  /* height: 100vh;  <-- remove this hard cap */
-  min-height: 100vh;   /* allow stacked sections to occupy full height */
+  min-height: 100vh;
   position: relative;
   overflow-y: auto;
 }
 
-.stacked-pages {
-  width: 100%;
-  flex-grow: 1;
-  position: relative;
-}
+.stacked-pages { width: 100%; flex-grow: 1; position: relative; }
 
-.footer {
-  position: relative;
-  width: 100vw;
-}
-
-/* ---------------- Shared layout & typography ---------------- */
+.footer { position: relative; width: 100vw; }
 
 /* Shared layout vars */
 :root {
   --container-max: 1200px;
   --container-inline: 94vw;
 
-  /* Core theme tokens (defaults / fallbacks) */
-  --bg: #0b1220;
-  --fg: #e5f0ff;
-  --muted: rgba(229,240,255,0.7);
-  --card-bg: rgba(255,255,255,0.04);
-  --card-border: rgba(229,240,255,0.12);
+  /* colour tokens used by pages/components */
   --accent: #93c5fd;
+  --card-bg: rgba(255, 255, 255, 0.04);
+  --card-border: rgba(229, 240, 255, 0.12);
+  --fg: #e5f0ff;
+  --muted: rgba(229, 240, 255, 0.7);
   --good: #86efac;
-  --bad:  #fca5a5;
-
-  /* Page backgrounds (used by each page's root class) */
-  --page-home:   #0ea5e9;
-  --page-list:   #22c55e;
-  --page-detail: #f59e0b;
-  --page-about:  #8b5cf6;
+  --bad: #fca5a5;
 }
 
-/* Shared page title — matches Dashboard style */
+/* Shared title */
 .page-title,
 .dashboard-box__title {
   font-size: clamp(1.6rem, 3.5vw, 2.1rem);
   font-weight: 700;
-  color: var(--accent, #93c5fd); /* falls back if not set on page */
+  color: var(--accent, #93c5fd);
   margin-bottom: 0.1rem;
 }
 
-/* Optional: left-aligned content wrapper for rich text */
+/* Optional prose wrapper */
 .prose {
   text-align: left;
   line-height: 1.6;
   font-size: 1.05rem;
 }
 .prose p + p { margin-top: 1.1rem; }
-
-/* ---------------- Themes (apply on <div class="App theme-...">) ---------------- */
-
-/* 7) Deep Navy Suite (dark mode) */
-.App.theme-navy {
-  --bg: #0B1B2B;
-  --fg: #E5F0FF;
-  --muted: rgba(229, 240, 255, 0.72);
-  --card-bg: rgba(255,255,255,0.05);
-  --card-border: rgba(184,205,246,0.18);
-  --accent: #7DD3FC;
-  --good: #86EFAC;
-  --bad:  #FCA5A5;
-
-  --page-home:   #517DB5;
-  --page-list:   #10253A;
-  --page-detail: #0F2538;
-  --page-about:  #133047;
-  --page-dashboard: #08131F;
-}

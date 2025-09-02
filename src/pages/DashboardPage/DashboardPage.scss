@@ -1,12 +1,10 @@
 /* src/pages/DashboardPage/DashboardPage.scss */
 .DashboardPage {
-  /* page tokens (cascade to children) */
   --bg: #0b1220;
   --fg: #e5f0ff;
   --muted: rgba(229, 240, 255, 0.7);
   --card-bg: rgba(255, 255, 255, 0.04);
   --card-border: rgba(229, 240, 255, 0.12);
-  --elev: 0 10px 30px rgba(0, 0, 0, 0.35);
   --accent: #93c5fd;
   --good: #86efac;
   --bad: #fca5a5;
@@ -16,7 +14,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--page-dashboard, var(--bg));
+  background: #08131F;
   color: var(--fg);
   text-align: center;
 }
@@ -26,16 +24,13 @@
 }
 
 .dashboard-box {
-  /* was: width: min(1200px, 94vw); */
   width: min(var(--container-max), var(--container-inline));
   display: grid;
   gap: 1rem;
 
   background: var(--card-bg);
-  outline: 1px solid var(--card-border);
-  outline-offset: -1px;
-  border-radius: 14px;
-  box-shadow: var(--elev);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
   padding: clamp(1rem, 2.6vw, 1.75rem);
   text-align: left;
 }
@@ -49,7 +44,9 @@
 
 .dashboard-box > * + * { position: relative; }
 .dashboard-box > * + *::before {
-  content: ""; display: block; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--card-border), transparent);
+  content: "";
+  display: block;
+  height: 1px;
+  background: var(--card-border);
   margin: 0.25rem 0 0.75rem 0;
 }

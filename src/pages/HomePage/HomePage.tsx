@@ -14,6 +14,19 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="HomePage">
+      {/* Background video */}
+      <video
+        className="home-bg-video"
+        autoPlay
+        muted
+        loop
+        playsInline
+      >
+        <source src="/assets/homepage-bg.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+
+      {/* Overlayed content */}
       <div className="home-content">
         <h1 className="homepage-title">Water Dashboard NSW</h1>
         <p className="homepage-subtitle">
