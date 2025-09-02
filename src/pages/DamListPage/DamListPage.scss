@@ -2,10 +2,18 @@
 
 .DamListPage {
   width: 100vw;
-  height: 100vh;
+  height: 100vh;        /* exact viewport height */
+  overflow: hidden;     /* never scroll the page */
 
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
+
+  /* if you add content later, wrap it in .content to allow internal scroll */
+  .content {
+    max-height: 80vh;
+    overflow: auto;
+    padding: 1rem;
+  }
 }

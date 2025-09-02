@@ -1,49 +1,35 @@
 // src/pages/AboutPage/AboutPage.scss
 
 .AboutPage {
-    width: 100vw;
-    height: 100vh;
-  
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 2rem 1rem;
-  }
-  
-  .about-card {
-    width: 100%;
-    max-width: 900px;
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: 12px;
-    padding: 1.5rem 1.75rem;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-  }
-  
-  .lead {
-    margin: 0.5rem 0 1rem;
-    color: #444;
-  }
-  .muted {
-    color: #666;
-  }
-  
-  h1 {
-    margin-bottom: 0.25rem;
-  }
-  h2 {
-    margin-top: 1.25rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  ul,
-  ol {
-    margin-left: 1.25rem;
-  }
-  
-  code {
-    background: #f7f7f7;
-    padding: 0.1rem 0.3rem;
-    border-radius: 4px;
-  }
-  
+  width: 100vw;
+  height: 100vh;        /* exact viewport height */
+  overflow: hidden;     /* never scroll the page */
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+}
+
+.about-card {
+  width: 100%;
+  max-width: 900px;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 1.5rem 1.75rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+
+  /* content scrolls inside the card if it exceeds viewport */
+  max-height: calc(100vh - 4rem); /* account for outer padding */
+  overflow: auto;
+}
+
+.lead { margin: 0.5rem 0 1rem; color: #444; }
+.muted { color: #666; }
+
+h1 { margin-bottom: 0.25rem; }
+h2 { margin-top: 1.25rem; margin-bottom: 0.5rem; }
+ul, ol { margin-left: 1.25rem; }
+code { background: #f7f7f7; padding: 0.1rem 0.3rem; border-radius: 4px; }
