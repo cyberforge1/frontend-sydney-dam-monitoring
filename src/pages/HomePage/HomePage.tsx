@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchBar from '../../components/SearchBar/SearchBar';
+import droneVideo from '../../assets/drone-footage-1.mp4';
 import './HomePage.scss';
 
 const HomePage: React.FC = () => {
@@ -22,7 +23,7 @@ const HomePage: React.FC = () => {
         loop
         playsInline
       >
-        <source src="/assets/homepage-bg.mp4" type="video/mp4" />
+        <source src={droneVideo} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
