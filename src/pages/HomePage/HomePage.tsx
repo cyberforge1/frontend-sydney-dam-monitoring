@@ -18,12 +18,17 @@ const HomePage: React.FC = () => {
       {/* Background video */}
       <video
         className="home-bg-video"
+        src={droneVideo}
         autoPlay
         muted
         loop
         playsInline
+        preload="auto"
+        aria-hidden="true"
+        tabIndex={-1}
+        onContextMenu={(e) => e.preventDefault()}
+        onPlay={(e) => e.currentTarget.play()}
       >
-        <source src={droneVideo} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
@@ -43,7 +48,6 @@ const HomePage: React.FC = () => {
             ariaLabel="Search for a Dam"
             buttonLabel="Search"
           />
-
           <button
             type="button"
             className="btn btn-primary"

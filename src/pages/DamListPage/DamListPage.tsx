@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useGetAllDamsQuery } from '../../services/damsApi';
+import droneVideo from '../../assets/drone-footage-1.mp4';
 import './DamListPage.scss';
 
 const DamListPage: React.FC = () => {
@@ -12,6 +13,23 @@ const DamListPage: React.FC = () => {
 
   return (
     <div className="DamListPage">
+      {/* Background video */}
+      <video
+        className="damlist-bg-video"
+        src={droneVideo}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        aria-hidden="true"
+        tabIndex={-1}
+        onContextMenu={(e) => e.preventDefault()}
+        onPlay={(e) => e.currentTarget.play()}
+      >
+        Your browser does not support the video tag.
+      </video>
+
       <Link to="/" className="home-btn" aria-label="Back to Home">
         ← Home
       </Link>

@@ -8,6 +8,7 @@ import DashboardPage from './pages/DashboardPage/DashboardPage';
 import DamListPage from './pages/DamListPage/DamListPage';
 import DamDetailPage from './pages/DamDetailPage/DamDetailPage';
 import AboutPage from './pages/AboutPage/AboutPage';
+import TestVideoPage from './components/TestVideoPage/TestVideoPage';
 import './App.scss';
 
 const App: React.FC = () => {
@@ -31,6 +32,7 @@ const App: React.FC = () => {
             <Route path="/dams" element={<DamListPage />} />
             <Route path="/dams/:damId" element={<DamDetailPage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/test-video" element={<TestVideoPage />} />
           </Routes>
         </Router>
       </div>
