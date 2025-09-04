@@ -25,3 +25,6 @@ dist-ssr
 
 
 .env
+
+src/assets/drone-footage-1.mp4
+src/assets/drone-footage-1-compressed.mp4
