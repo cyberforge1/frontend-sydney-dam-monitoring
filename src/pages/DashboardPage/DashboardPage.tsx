@@ -28,7 +28,7 @@ const DashboardPage: React.FC = () => {
         onClick={prev}
         aria-label="Previous graph"
       >
-        ◀
+        <span className="arrow-icon arrow-icon--left" />
       </button>
 
       <section className="graph-stage" role="region" aria-label="Graph stage">
@@ -42,7 +42,7 @@ const DashboardPage: React.FC = () => {
         onClick={next}
         aria-label="Next graph"
       >
-        ▶
+        <span className="arrow-icon arrow-icon--right" />
       </button>
     </div>
   );
