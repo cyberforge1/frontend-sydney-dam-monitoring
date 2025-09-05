@@ -2,33 +2,37 @@
 
 .AboutPage {
   width: 100%;
-  min-height: 100vh;
-  background: #ffffff;
-  color: #111827;
-
+  min-height: 100vh;          /* ensure full height */
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* keeps footer at bottom */
-  text-align: center;
+  background: #ffffff;
+  color: #000000;
+}
 
-  /* Outline around the page itself */
-  border: 1px solid #e5e7eb;
+.AboutPage__main {
+  flex: 1;                    /* take up remaining space above footer */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.about-stage {
+  width: 70vw;
+  height: 46vh;               /* half the height of dashboard container */
+  border: 1px solid #000000;
   border-radius: 8px;
-  box-sizing: border-box;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem;
 }
 
-@supports (height: 100dvh) {
-  .AboutPage { min-height: 100dvh; }
-}
-
-.about-main {
-  flex: 1; /* take up available space above footer */
-  display: grid;
-  place-items: center;
-}
-
-.about-title {
-  font-size: clamp(1.8rem, 4vw, 2.6rem);
-  font-weight: 700;
-  margin: 0;
+.about-canvas {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  text-align: left;
+  font-size: 1rem;
+  line-height: 1.5;
 }

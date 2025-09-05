@@ -36,17 +36,18 @@ const SearchBar: React.FC<Props> = ({
   const listId = useId();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
+  // Close dropdown + clear when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
         setOpen(false);
         setActiveIdx(-1);
+        onChange(''); // clear text
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [onChange]);
 
   const results: Dam[] = useMemo(() => {
     const q = normalize(value);
@@ -62,19 +63,22 @@ const SearchBar: React.FC<Props> = ({
     if (activeIdx >= 0 && activeIdx < results.length) {
       onSearch(results[activeIdx].dam_id);
       setOpen(false);
+      onChange(''); // clear after search
       return;
     }
     const q = value.trim();
     if (q) {
       onSearch(q);
       setOpen(false);
+      onChange(''); // clear after search
     }
-  }, [activeIdx, results, value, onSearch]);
+  }, [activeIdx, results, value, onSearch, onChange]);
 
   const select = (dam: Dam) => {
     onSearch(dam.dam_id);
     setOpen(false);
     setActiveIdx(-1);
+    onChange(''); // clear after selecting
   };
 
   return (
@@ -114,6 +118,7 @@ const SearchBar: React.FC<Props> = ({
           } else if (e.key === 'Escape') {
             setOpen(false);
             setActiveIdx(-1);
+            onChange(''); // clear text
           }
         }}
       />
