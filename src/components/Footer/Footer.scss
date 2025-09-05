@@ -1,36 +1,33 @@
 /* src/components/Footer/Footer.scss */
+
 .Footer {
-  position: static;
   width: 100%;
-  background: var(--card-bg);
-  border-top: 1px solid var(--card-border);
-  color: var(--fg);
-  padding-block: 0.6rem;
+  background: #ffffff;   /* flat white */
+  color: #111827;
+  padding: 0.75rem;
+  text-align: center;
+  border-top: 1px solid #e5e7eb; /* subtle divider */
 }
 
 .Footer__inner {
-  width: min(var(--container-max, 1200px), var(--container-inline, 94vw));
-  margin-inline: auto;
   display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-inline: 0.75rem;
+  justify-content: center;
 }
 
-.Footer__left { font-size: 0.9rem; opacity: 0.9; }
+.Footer__left {
+  font-size: 0.9rem;
+}
 
-.Footer__right { display: inline-flex; gap: 0.8rem; }
+.Footer__right {
+  display: flex;
+  gap: 1rem;
+}
 
 .Footer__right a {
-  display: inline-grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 6px;
-  color: var(--fg);
-  background: rgba(255,255,255,0.06);
-  border: 1px solid var(--card-border);
+  color: #111827;
+  text-decoration: underline;
+  font-size: 0.9rem;
 }
-
-.Footer__right svg { display: block; }

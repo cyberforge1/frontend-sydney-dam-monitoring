@@ -1,38 +1,34 @@
 /* src/pages/AboutPage/AboutPage.scss */
+
 .AboutPage {
   width: 100%;
   min-height: 100vh;
-  background: #133047;
-  color: var(--fg, #ffffff);
+  background: #ffffff;
+  color: #111827;
 
-  display: grid;
-  grid-template-rows: 1fr auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* keeps footer at bottom */
+  text-align: center;
+
+  /* Outline around the page itself */
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-sizing: border-box;
 }
 
 @supports (height: 100dvh) {
   .AboutPage { min-height: 100dvh; }
 }
 
-.AboutPage__main {
+.about-main {
+  flex: 1; /* take up available space above footer */
   display: grid;
   place-items: center;
-  padding: clamp(1rem, 3vw, 2rem);
 }
 
-.text-box {
-  width: min(var(--container-max, 1200px), var(--container-inline, 94vw));
-  margin-inline: auto;
-
-  background: var(--card-bg, rgba(255,255,255,0.1));
-  border: 1px solid var(--card-border, rgba(229,240,255,0.12));
-  border-radius: 8px;
-  padding: clamp(1rem, 2.6vw, 1.75rem);
-}
-
-.text-box-list { list-style: none; padding: 0; margin: 0; }
-
-.text-box-list p {
-  margin-bottom: 1.1rem;
-  line-height: 1.6;
-  font-size: 1.05rem;
+.about-title {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 700;
+  margin: 0;
 }

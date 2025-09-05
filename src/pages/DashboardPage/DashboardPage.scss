@@ -1,52 +1,27 @@
 /* src/pages/DashboardPage/DashboardPage.scss */
-.DashboardPage {
-  --bg: #0b1220;
-  --fg: #e5f0ff;
-  --muted: rgba(229, 240, 255, 0.7);
-  --card-bg: rgba(255, 255, 255, 0.04);
-  --card-border: rgba(229, 240, 255, 0.12);
-  --accent: #93c5fd;
-  --good: #86efac;
-  --bad: #fca5a5;
 
+.DashboardPage {
   width: 100%;
-  min-height: 100svh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #08131F;
-  color: var(--fg);
+  min-height: 100vh;
+  background: #ffffff;
+  color: #111827;
+
+  display: grid;
+  place-items: center;
   text-align: center;
+
+  /* Outline around the page itself */
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-sizing: border-box;
 }
 
 @supports (height: 100dvh) {
   .DashboardPage { min-height: 100dvh; }
 }
 
-.dashboard-box {
-  width: min(var(--container-max), var(--container-inline));
-  display: grid;
-  gap: 1rem;
-
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 8px;
-  padding: clamp(1rem, 2.6vw, 1.75rem);
-  text-align: left;
-}
-
-.dashboard-box__title {
-  font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+.dashboard-title {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
   font-weight: 700;
-  color: var(--accent);
-  margin-bottom: 0.1rem;
-}
-
-.dashboard-box > * + * { position: relative; }
-.dashboard-box > * + *::before {
-  content: "";
-  display: block;
-  height: 1px;
-  background: var(--card-border);
-  margin: 0.25rem 0 0.75rem 0;
+  margin: 0;
 }

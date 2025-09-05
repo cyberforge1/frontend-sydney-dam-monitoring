@@ -1,21 +1,28 @@
 /* src/pages/DamDetailPage/DamDetailPage.scss */
+
 .DamDetailPage {
   width: 100%;
   min-height: 100vh;
-  background: #0F2538;
+  background: #ffffff;
   color: #111827;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: left;
-  padding: 2rem;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  position: relative; /* anchor for absolute elements if needed */
 }
 
 @supports (height: 100dvh) {
   .DamDetailPage { min-height: 100dvh; }
 }
 
+.damdetail-title {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Top-left Home button (pinned to viewport) */
 .home-btn {
   position: fixed;
   top: 16px;
@@ -26,84 +33,17 @@
   align-items: center;
   gap: 0.25rem;
 
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 0.95rem;
-
   padding: 0.55rem 0.9rem;
-  border-radius: 8px;
-  border: 1px solid rgba(17, 24, 39, 0.12);
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
   background: #ffffff;
   color: #111827;
-}
-
-.detail-content {
-  width: min(1100px, 92vw);
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-}
-
-.detail-header { margin-bottom: 0.25rem; }
-
-.detail-title {
-  font-size: clamp(1.8rem, 4vw, 2.6rem);
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  color: #ffffff; /* force white text */
-}
-
-.detail-id { font-weight: 600; opacity: 0.85; }
-
-.card {
-  background: #ffffff;
-  border: 1px solid rgba(17,24,39,0.12);
-  border-radius: 8px;
-  padding: 1.25rem;
-}
-
-.section-title {
-  font-size: clamp(1.2rem, 3vw, 1.5rem);
-  font-weight: 700;
-  margin-bottom: 0.75rem;
-}
-
-.meta-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 0.75rem;
-}
-
-.kv { display: grid; grid-template-columns: 1fr; }
-.k { font-size: 0.85rem; opacity: 0.7; }
-.v { font-weight: 600; }
-
-.table.like-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.25rem;
-}
-
-.t-head, .t-row {
-  display: grid;
-  grid-template-columns: 1.2fr repeat(3, 1fr);
-  gap: 0.5rem;
-  padding: 0.5rem 0;
-}
-
-.t-head { border-bottom: 1px solid rgba(17,24,39,0.12); font-weight: 700; }
-.t-row:not(:last-child) { border-bottom: 1px dashed rgba(17,24,39,0.12); }
-
-.row-gap { display: flex; gap: 0.5rem; }
-
-.btn {
-  appearance: none;
-  border: 1px solid rgba(17,24,39,0.2);
-  background: #fff;
-  padding: 0.55rem 0.9rem;
-  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
   cursor: pointer;
 }
 
-.muted { opacity: 0.75; }
-.error { color: #7f1d1d; }
+.home-btn:hover {
+  background: #f3f4f6;
+}

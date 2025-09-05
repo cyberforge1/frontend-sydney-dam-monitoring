@@ -1,60 +1,64 @@
 /* src/components/SearchBar/SearchBar.scss */
+
 .SearchBar {
   position: relative;
   display: flex;
   gap: 0.5rem;
   flex: 1 1 420px;
   max-width: 650px;
-  text-align: left;
 }
 
 .SearchBar input {
   flex: 1;
   padding: 0.65rem 1rem;
   border-radius: 8px;
-  border: 1px solid rgba(17, 24, 39, 0.15);
+  border: 1px solid #e5e7eb;
   font-size: 1rem;
-  text-align: left;
+  background: #ffffff;
+  color: #111827;
 }
 
 .SearchBar button {
   padding: 0.65rem 1rem;
-  border: 1px solid rgba(17, 24, 39, 0.15);
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
   font-weight: 600;
   background: #ffffff;
-  color: #0ea5e9;
+  color: #111827;
+  cursor: pointer;
 }
 
 .SearchBar__dropdown {
   position: absolute;
   top: calc(100% + 0.35rem);
-  left: 0; right: 0;
-  z-index: 30;
-  max-height: 280px;
-  overflow: auto;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  max-height: 240px;
+  overflow-y: auto;
   list-style: none;
   margin: 0;
   padding: 0.35rem;
-  background: #fff;
-  border: 1px solid rgba(17, 24, 39, 0.15);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
-  text-align: left;
+  text-align: left;   /* ⬅️ force left alignment */
 }
 
 .SearchBar__option {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0.5rem;
-  align-items: center;
-  padding: 0.5rem 0.6rem;
+  padding: 0.55rem 0.6rem;
   border-radius: 6px;
+  cursor: pointer;
+  color: #111827;
+  text-align: left;   /* ⬅️ each option left aligned */
 }
 
-.SearchBar__option .name { font-weight: 400; color: #111827; }
-.SearchBar__option .id { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; opacity: 0.75; }
-
 .SearchBar__option.is-active,
-.SearchBar__option:hover { background: #f3f4f6; }
+.SearchBar__option:hover {
+  background: #f3f4f6;
+}
 
-.SearchBar__option.is-muted { color: #6b7280; }
+.SearchBar__option.is-muted {
+  color: #6b7280;
+  cursor: default;
+}

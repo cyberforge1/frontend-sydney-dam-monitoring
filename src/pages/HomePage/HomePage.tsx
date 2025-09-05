@@ -1,4 +1,5 @@
 // src/pages/HomePage/HomePage.tsx
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchBar from '../../components/SearchBar/SearchBar';
@@ -15,7 +16,7 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="HomePage">
-      {/* Background video */}
+      {/* Background video (restored) */}
       <video
         className="home-bg-video"
         src={droneVideo}
@@ -32,7 +33,7 @@ const HomePage: React.FC = () => {
         Your browser does not support the video tag.
       </video>
 
-      {/* Overlayed content */}
+      {/* Foreground content */}
       <div className="home-content">
         <h1 className="homepage-title">Water Dashboard NSW</h1>
         <p className="homepage-subtitle">
@@ -48,14 +49,7 @@ const HomePage: React.FC = () => {
             ariaLabel="Search for a Dam"
             buttonLabel="Search"
           />
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => navigate('/dams')}
-            aria-label="Go to Dam List"
-          >
-            View Dam List
-          </button>
+          {/* "View Dam List" button intentionally removed */}
         </div>
       </div>
     </div>

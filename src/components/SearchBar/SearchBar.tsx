@@ -1,5 +1,6 @@
 // src/components/SearchBar/SearchBar.tsx
-import React, { useCallback, useId, useMemo, useState } from 'react';
+
+import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import './SearchBar.scss';
 import { useGetAllDamsQuery } from '../../services/damsApi';
 import type { Dam } from '../../types/types';
@@ -7,13 +8,12 @@ import type { Dam } from '../../types/types';
 type Props = {
   value: string;
   onChange: (next: string) => void;
-  onSearch: (query: string) => void;   // existing behavior (still called)
+  onSearch: (query: string) => void;
   placeholder?: string;
   ariaLabel?: string;
   buttonLabel?: string;
   autoFocus?: boolean;
   className?: string;
-  maxResults?: number;                  // optional cap on suggestions
 };
 
 const normalize = (s: string) => s.toLowerCase().trim();
@@ -22,42 +22,53 @@ const SearchBar: React.FC<Props> = ({
   value,
   onChange,
   onSearch,
-  placeholder = 'Search…',
-  ariaLabel = 'Search',
+  placeholder = 'Search for a dam…',
+  ariaLabel = 'Search for a dam',
   buttonLabel = 'Search',
   autoFocus = false,
   className,
-  maxResults = 8,
 }) => {
-  // Get all dams once; RTK Query caches this across the app.
   const { data: dams = [], isLoading } = useGetAllDamsQuery();
 
   const [open, setOpen] = useState(false);
   const [activeIdx, setActiveIdx] = useState(-1);
 
-  const listId = useId(); // unique id for a11y
+  const listId = useId();
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        setActiveIdx(-1);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const results: Dam[] = useMemo(() => {
     const q = normalize(value);
-    if (!q) return [];
-    return dams
-      .filter((d) => {
-        const name = normalize(d.dam_name ?? '');
-        const id = normalize(d.dam_id ?? '');
-        return name.includes(q) || id.includes(q);
-      })
-      .slice(0, maxResults);
-  }, [dams, value, maxResults]);
+    if (!q) return dams;
+    return dams.filter(
+      (d) =>
+        normalize(d.dam_name ?? '').includes(q) ||
+        normalize(d.dam_id ?? '').includes(q)
+    );
+  }, [dams, value]);
 
   const doSearch = useCallback(() => {
-    // If a suggestion is highlighted, prefer it.
     if (activeIdx >= 0 && activeIdx < results.length) {
       onSearch(results[activeIdx].dam_id);
+      setOpen(false);
       return;
     }
-    // Otherwise perform the original search behavior with the raw input.
     const q = value.trim();
-    if (q) onSearch(q);
+    if (q) {
+      onSearch(q);
+      setOpen(false);
+    }
   }, [activeIdx, results, value, onSearch]);
 
   const select = (dam: Dam) => {
@@ -68,6 +79,7 @@ const SearchBar: React.FC<Props> = ({
 
   return (
     <div
+      ref={wrapperRef}
       className={['SearchBar', className].filter(Boolean).join(' ')}
       role="combobox"
       aria-expanded={open}
@@ -79,28 +91,20 @@ const SearchBar: React.FC<Props> = ({
         value={value}
         placeholder={placeholder}
         aria-label={ariaLabel}
-        aria-autocomplete="list"
-        aria-controls={listId}
-        aria-activedescendant={
-          activeIdx >= 0 ? `${listId}-opt-${activeIdx}` : undefined
-        }
         autoFocus={autoFocus}
         onFocus={() => setOpen(true)}
         onChange={(e) => {
           onChange(e.target.value);
           setOpen(true);
-          setActiveIdx(-1);
         }}
         onKeyDown={(e) => {
           if (e.key === 'ArrowDown') {
             e.preventDefault();
-            setOpen(true);
             setActiveIdx((prev) =>
               results.length ? (prev + 1 + results.length) % results.length : -1
             );
           } else if (e.key === 'ArrowUp') {
             e.preventDefault();
-            setOpen(true);
             setActiveIdx((prev) =>
               results.length ? (prev - 1 + results.length) % results.length : -1
             );
@@ -112,50 +116,32 @@ const SearchBar: React.FC<Props> = ({
             setActiveIdx(-1);
           }
         }}
-        onBlur={() => {
-          // Delay closing to allow click selection (handled via onMouseDown)
-          setTimeout(() => setOpen(false), 0);
-        }}
       />
-      <button type="button" onClick={doSearch}>
-        {buttonLabel}
-      </button>
 
-      {open && (isLoading || results.length > 0) && (
+      <button type="button" onClick={doSearch}>{buttonLabel}</button>
+
+      {open && (
         <ul id={listId} role="listbox" className="SearchBar__dropdown">
           {isLoading && (
-            <li className="SearchBar__option is-muted" aria-disabled="true">
-              Loading dams…
-            </li>
+            <li className="SearchBar__option is-muted">Loading dams…</li>
           )}
-
-          {!isLoading &&
-            results.map((d, idx) => (
-              <li
-                key={d.dam_id}
-                id={`${listId}-opt-${idx}`}
-                role="option"
-                aria-selected={idx === activeIdx}
-                className={[
-                  'SearchBar__option',
-                  idx === activeIdx ? 'is-active' : '',
-                ]
-                  .filter(Boolean)
-                  .join(' ')}
-                // Use mousedown so blur doesn't cancel the click
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  select(d);
-                }}
-              >
-                <span className="name">{d.dam_name ?? 'Unnamed Dam'}</span>
-                <span className="id">{d.dam_id}</span>
-              </li>
-            ))}
-          {!isLoading && results.length === 0 && value.trim() && (
-            <li className="SearchBar__option is-muted" aria-disabled="true">
-              No matches
+          {!isLoading && results.map((d, idx) => (
+            <li
+              key={d.dam_id}
+              id={`${listId}-opt-${idx}`}
+              role="option"
+              aria-selected={idx === activeIdx}
+              className={[
+                'SearchBar__option',
+                idx === activeIdx ? 'is-active' : '',
+              ].join(' ')}
+              onMouseDown={(e) => { e.preventDefault(); select(d); }}
+            >
+              {d.dam_name ?? 'Unnamed Dam'}
             </li>
+          ))}
+          {!isLoading && results.length === 0 && (
+            <li className="SearchBar__option is-muted">No matches</li>
           )}
         </ul>
       )}
