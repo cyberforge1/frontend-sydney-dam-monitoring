@@ -4,46 +4,77 @@
   width: 100%;
   min-height: 100vh;
   background: #ffffff;
-  color: #111827;
+  color: #000000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border: 1px solid #000000;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.detail-stage {
+  width: calc(100% - 4rem);   /* adds more margin horizontally */
+  height: calc(100% - 4rem);  /* adds more margin vertically */
+  margin: 2rem;               /* margin space around container */
+
+  max-width: none;
+  max-height: none;
 
   display: grid;
-  place-items: center;
-  text-align: center;
-  position: relative; /* anchor for absolute elements if needed */
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 10vh 1fr 1fr;
+
+  border: 1px solid #8a2be2;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #ffffff;
 }
 
-@supports (height: 100dvh) {
-  .DamDetailPage { min-height: 100dvh; }
-}
 
-.damdetail-title {
-  font-size: clamp(1.8rem, 4vw, 2.6rem);
-  font-weight: 700;
-  margin: 0;
-}
 
-/* Top-left Home button (pinned to viewport) */
-.home-btn {
-  position: fixed;
-  top: 16px;
-  left: 16px;
-  z-index: 10;
-
-  display: inline-flex;
+/* Hero bar with left-aligned button + centered title */
+.hero {
+  grid-column: 1 / -1;
+  display: flex;
   align-items: center;
-  gap: 0.25rem;
+  justify-content: center;
+  position: relative;
+
+  background: #ffffff;
+  border-bottom: 1px solid #8a2be2;
+}
+
+.home-btn {
+  position: absolute;
+  left: 1rem;
 
   padding: 0.55rem 0.9rem;
+  border: 1px solid #000000;
   border-radius: 6px;
-  border: 1px solid #e5e7eb;
   background: #ffffff;
-  color: #111827;
+  color: #000000;
   font-weight: 600;
-  font-size: 0.9rem;
   text-decoration: none;
-  cursor: pointer;
 }
 
-.home-btn:hover {
-  background: #f3f4f6;
+.hero__title {
+  font-weight: 700;
+  font-size: 1rem;
+  text-align: center;
 }
+
+/* Panels */
+.panel {
+  display: grid;
+  place-items: center;
+  border-right: 1px solid #8a2be2;
+  border-bottom: 1px solid #8a2be2;
+}
+
+.panel:nth-of-type(2),
+.panel:nth-of-type(4) { border-right: none; }
+
+.panel:nth-of-type(3),
+.panel:nth-of-type(4) { border-bottom: none; }
